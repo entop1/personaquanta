@@ -16,6 +16,7 @@
       --accent2:#00E0B8;
     }
     *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
     body{
       margin:0;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -27,8 +28,9 @@
       padding:56px 18px;
     }
     .wrap{max-width:980px;margin:0 auto}
-    .nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+    .nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:16px}
     .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.2px}
+    .brand img{width:22px;height:22px;object-fit:contain;display:block}
     .dot{width:10px;height:10px;border-radius:99px;background:linear-gradient(135deg,var(--accent),var(--accent2))}
     .hero{display:grid;grid-template-columns:1.25fr .75fr;gap:18px;align-items:start}
     @media (max-width:900px){.hero{grid-template-columns:1fr}}
@@ -41,6 +43,7 @@
       border:1px solid var(--border);
       color:var(--text);text-decoration:none;
       background:rgba(255,255,255,.04);
+      transition:transform .12s ease, border-color .12s ease, background .12s ease;
     }
     .btn.primary{border-color:rgba(42,167,255,.45); background:rgba(42,167,255,.12)}
     .btn:hover{transform:translateY(-1px)}
@@ -49,6 +52,7 @@
       border:1px solid var(--border);
       border-radius:18px;
       padding:16px 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.22);
     }
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
     @media (max-width:900px){.grid{grid-template-columns:1fr}}
@@ -61,18 +65,26 @@
       padding:6px 10px;border-radius:999px;
       border:1px solid rgba(255,255,255,.14);
       background:rgba(255,255,255,.04);
+      white-space:nowrap;
     }
     .footer{margin-top:22px;color:rgba(234,240,255,.55);font-size:12px}
     .note{color:rgba(234,240,255,.62);font-size:13px;margin-top:10px}
+    /* Make anchor jumps obvious */
+    #overview:target{
+      outline:2px solid rgba(42,167,255,.55);
+      box-shadow: 0 0 0 6px rgba(42,167,255,.10);
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="nav">
       <div class="brand">
-  <img src="logo.png" alt="PersonaQuanta" style="width:22px;height:22px;object-fit:contain" />
-  PersonaQuanta
-</div>
+        <!-- If logo.png is missing, hide broken image and show dot -->
+        <img src="logo.png" alt="PersonaQuanta" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+        <span class="dot" style="display:none"></span>
+        PersonaQuanta
+      </div>
       <div class="note">Pilot Blueprint / concept license under NDA</div>
     </div>
 
@@ -80,16 +92,19 @@
       <div class="card">
         <h1>Your life, quantified.</h1>
         <p class="tag"><b>See your index.</b> Change your trajectory.</p>
+
         <p class="tag" style="max-width:62ch">
-          Entertainment-first “economic persona” scoring that turns user-provided inputs into explainable indices with confidence ranges and instant what-if simulations — designed for fintech & insurance engagement. 
-        <p class="note">Built as a pilot-ready blueprint: scoring spec, questionnaire schema, demo script, and export formats.</p>
+          Entertainment-first “economic persona” scoring that turns user-provided inputs into explainable indices with confidence ranges and instant what-if simulations — designed for fintech &amp; insurance engagement.
+        </p>
+
+        <p class="note">
+          Built as a pilot-ready blueprint: scoring spec, questionnaire schema, demo script, and export formats.
         </p>
 
         <div class="cta">
-          <!-- Replace YOUR_EMAIL_HERE if you want email CTA -->
           <a class="btn primary" href="#overview">View one-page overview</a>
-          <a class="btn" href="mailto:personaquanta@proton.me?subject=PersonaQuanta%20—%20NDA%20Request&body=Hi%2C%0A%0AI%27d%20like%20to%20review%20PersonaQuanta%20under%20NDA.%0A%0ACompany%3A%0ARole%3A%0ACountry%3A%0AUse%20case%3A%0A%0AThanks.">Request NDA</a>
-          <a class="btn" href="mailto:personaquanta@proton.me?subject=PersonaQuanta%20—%20Pilot%20Offer%20Request&body=Hi%2C%0A%0AI%27d%20like%20a%20pilot%20offer%20outline%20for%20PersonaQuanta.%0A%0ACompany%3A%0ARole%3A%0ACountry%3A%0AUsers%20%28approx.%29%3A%0ATarget%20segment%3A%0ATimeline%3A%0A%0AThanks.">Request Pilot Offer</a>
+          <a class="btn" href="mailto:personaquanta@proton.me?subject=PersonaQuanta%20%E2%80%94%20NDA%20Request&body=Hi%2C%0A%0AI%27d%20like%20to%20review%20PersonaQuanta%20under%20NDA.%0A%0ACompany%3A%0ARole%3A%0ACountry%3A%0AUse%20case%3A%0A%0AThanks.">Request NDA</a>
+          <a class="btn" href="mailto:personaquanta@proton.me?subject=PersonaQuanta%20%E2%80%94%20Pilot%20Offer%20Request&body=Hi%2C%0A%0AI%27d%20like%20a%20pilot%20offer%20outline%20for%20PersonaQuanta.%0A%0ACompany%3A%0ARole%3A%0ACountry%3A%0AUsers%20%28approx.%29%3A%0ATarget%20segment%3A%0ATimeline%3A%0A%0AThanks.">Request Pilot Offer</a>
         </div>
 
         <div class="kpi">
@@ -101,21 +116,23 @@
       </div>
 
       <div class="card" id="overview">
-  <h2>Outputs</h2>
+        <h2>Outputs</h2>
         <ul>
           <li><b>NW</b> — Net Worth (range)</li>
           <li><b>LEP</b> — Lifetime Earnings Potential (range)</li>
-          <li><b>SEV</b> — Stability & Expense Volatility (0–100)</li>
+          <li><b>SEV</b> — Stability &amp; Expense Volatility (0–100)</li>
           <li><b>CS</b> — Composite Score (0–100)</li>
         </ul>
 
-        <h2 style="margin-top:14px">Why fintech & insurance teams care</h2>
+        <h2 style="margin-top:14px">Why fintech &amp; insurance teams care</h2>
         <ul>
           <li>Higher-engagement onboarding (gamified, explainable)</li>
           <li>Stability bands for personalization</li>
           <li>Export-ready report (PDF/JSON)</li>
         </ul>
+
         <p class="note">Pseudonym-first. No real name required. User-controlled inputs.</p>
+        <p class="note">No financial advice. Entertainment-first. Ranges reflect uncertainty.</p>
       </div>
     </div>
 
@@ -125,9 +142,10 @@
         <ul>
           <li>Income shock vs. income growth</li>
           <li>Debt-to-income improvement plan</li>
-          <li>Coverage level & deductible impact</li>
+          <li>Coverage level &amp; deductible impact</li>
         </ul>
       </div>
+
       <div class="card">
         <h2>Delivery for a pilot</h2>
         <ul>

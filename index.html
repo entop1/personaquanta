@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PersonaQuanta</title>
   <meta name="description" content="PersonaQuanta — Your life, quantified. See your index. Change your trajectory." />
+
   <style>
     :root{
       --bg:#070B14;
@@ -28,10 +29,25 @@
       padding:56px 18px;
     }
     .wrap{max-width:980px;margin:0 auto}
-    .nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:16px}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.2px}
+    .nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:22px;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:700;
+      letter-spacing:.2px;
+      min-width:220px;
+    }
     .brand img{width:22px;height:22px;object-fit:contain;display:block}
     .dot{width:10px;height:10px;border-radius:99px;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+    .note{color:rgba(234,240,255,.62);font-size:13px}
     .hero{display:grid;grid-template-columns:1.25fr .75fr;gap:18px;align-items:start}
     @media (max-width:900px){.hero{grid-template-columns:1fr}}
     h1{font-size:52px;line-height:1.05;margin:0 0 10px}
@@ -44,6 +60,7 @@
       color:var(--text);text-decoration:none;
       background:rgba(255,255,255,.04);
       transition:transform .12s ease, border-color .12s ease, background .12s ease;
+      white-space:nowrap;
     }
     .btn.primary{border-color:rgba(42,167,255,.45); background:rgba(42,167,255,.12)}
     .btn:hover{transform:translateY(-1px)}
@@ -68,27 +85,61 @@
       white-space:nowrap;
     }
     .footer{margin-top:22px;color:rgba(234,240,255,.55);font-size:12px}
-    .note{color:rgba(234,240,255,.62);font-size:13px;margin-top:10px}
-    /* Make anchor jumps obvious */
-    #overview:target{
+
+    /* Anchor highlight */
+    #overview:target, #downloads:target, #contact:target{
       outline:2px solid rgba(42,167,255,.55);
       box-shadow: 0 0 0 6px rgba(42,167,255,.10);
     }
+
+    /* Small helper links */
+    .navlinks{display:flex;gap:10px;flex-wrap:wrap}
+    .navlinks a{
+      color:rgba(234,240,255,.72);
+      text-decoration:none;
+      border-bottom:1px dashed rgba(234,240,255,.22);
+      padding-bottom:2px;
+      font-size:13px;
+    }
+    .navlinks a:hover{color:var(--text);border-bottom-color:rgba(234,240,255,.45)}
   </style>
+
+  <script>
+    // Ensure the overview jump works even when landing directly with #overview on some browsers/themes.
+    window.addEventListener('DOMContentLoaded', () => {
+      const hash = window.location.hash;
+      if (!hash) return;
+      const el = document.querySelector(hash);
+      if (el) {
+        // slight delay helps after layout/render
+        setTimeout(() => el.scrollIntoView({behavior:'smooth', block:'start'}), 80);
+      }
+    });
+  </script>
 </head>
+
 <body>
   <div class="wrap">
+
     <div class="nav">
       <div class="brand">
-        <!-- If logo.png is missing, hide broken image and show dot -->
+        <!-- If logo.png missing, hide broken image and show dot -->
         <img src="logo.png" alt="PersonaQuanta" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
         <span class="dot" style="display:none"></span>
         PersonaQuanta
       </div>
+
+      <div class="navlinks">
+        <a href="#overview">Overview</a>
+        <a href="#downloads">Downloads</a>
+        <a href="#contact">Contact</a>
+      </div>
+
       <div class="note">Pilot Blueprint / concept license under NDA</div>
     </div>
 
     <div class="hero">
+
       <div class="card">
         <h1>Your life, quantified.</h1>
         <p class="tag"><b>See your index.</b> Change your trajectory.</p>
@@ -103,15 +154,31 @@
 
         <div class="cta">
           <a class="btn primary" href="#overview">View one-page overview</a>
-          <a class="btn" href="mailto:personaquanta@proton.me?subject=PersonaQuanta%20%E2%80%94%20NDA%20Request&body=Hi%2C%0A%0AI%27d%20like%20to%20review%20PersonaQuanta%20under%20NDA.%0A%0ACompany%3A%0ARole%3A%0ACountry%3A%0AUse%20case%3A%0A%0AThanks.">Request NDA</a>
-          <a class="btn" href="mailto:personaquanta@proton.me?subject=PersonaQuanta%20%E2%80%94%20Pilot%20Offer%20Request&body=Hi%2C%0A%0AI%27d%20like%20a%20pilot%20offer%20outline%20for%20PersonaQuanta.%0A%0ACompany%3A%0ARole%3A%0ACountry%3A%0AUsers%20%28approx.%29%3A%0ATarget%20segment%3A%0ATimeline%3A%0A%0AThanks.">Request Pilot Offer</a>
+
+          <!-- PDFs (your current repo filenames) -->
+          <a class="btn" href="PersonaQuanta_Pilot_offer_(v0.2)_exec.pdf" target="_blank" rel="noopener">
+            Download 1-page PDF
+          </a>
+          <a class="btn" href="PersonaQuanta_Pilot_offer_(v0.1).pdf" target="_blank" rel="noopener">
+            Download full Pilot PDF
+          </a>
+
+          <!-- Email CTAs -->
+          <a class="btn" href="mailto:personaquanta@proton.me?subject=PersonaQuanta%20%E2%80%94%20NDA%20Request&body=Hi%2C%0A%0AI%27d%20like%20to%20review%20PersonaQuanta%20under%20NDA.%0A%0ACompany%3A%0ARole%3A%0ACountry%3A%0AUse%20case%3A%0A%0AThanks.">
+            Request NDA
+          </a>
+          <a class="btn" href="mailto:personaquanta@proton.me?subject=PersonaQuanta%20%E2%80%94%20Pilot%20Offer%20Request&body=Hi%2C%0A%0AI%27d%20like%20a%20pilot%20offer%20outline%20for%20PersonaQuanta.%0A%0ACompany%3A%0ARole%3A%0ACountry%3A%0AUsers%20%28approx.%29%3A%0ATarget%20segment%3A%0ATimeline%3A%0A%0AThanks.">
+            Request Pilot Offer
+          </a>
         </div>
 
         <div class="kpi">
           <span class="pill">CONF + ranges</span>
           <span class="pill">What-if (3 scenarios)</span>
           <span class="pill">Top Drivers (explainability)</span>
+          <span class="pill">Alignment Score</span>
           <span class="pill">Pseudonym-first</span>
+          <span class="pill">Export (PDF/JSON)</span>
         </div>
       </div>
 
@@ -128,12 +195,14 @@
         <ul>
           <li>Higher-engagement onboarding (gamified, explainable)</li>
           <li>Stability bands for personalization</li>
+          <li>Instant “what-if” exploration (3 scenarios)</li>
           <li>Export-ready report (PDF/JSON)</li>
         </ul>
 
         <p class="note">Pseudonym-first. No real name required. User-controlled inputs.</p>
         <p class="note">No financial advice. Entertainment-first. Ranges reflect uncertainty.</p>
       </div>
+
     </div>
 
     <div class="grid">
@@ -150,9 +219,30 @@
         <h2>Delivery for a pilot</h2>
         <ul>
           <li>Questionnaire schema + scoring spec</li>
-          <li>Reference UI mock + demo script</li>
-          <li>Exportable report format</li>
+          <li>Reference UX flow + demo script</li>
+          <li>Exportable report format (PDF/JSON)</li>
         </ul>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card" id="downloads">
+        <h2>Downloads</h2>
+        <ul>
+          <li><a class="btn" style="margin-top:6px" href="PersonaQuanta_Pilot_offer_(v0.2)_exec.pdf" target="_blank" rel="noopener">Executive 1-page PDF</a></li>
+          <li><a class="btn" style="margin-top:6px" href="PersonaQuanta_Pilot_offer_(v0.1).pdf" target="_blank" rel="noopener">Full Pilot Offer PDF</a></li>
+        </ul>
+        <p class="note">If you prefer, request the pack under NDA via email.</p>
+      </div>
+
+      <div class="card" id="contact">
+        <h2>Contact</h2>
+        <ul>
+          <li><b>Email:</b> personaquanta@proton.me</li>
+          <li><b>Availability:</b> Pilot Blueprint / concept license under NDA</li>
+          <li><b>Suggested pricing:</b> $4,900 (Blueprint) / $9,900 (Blueprint + demo) / $14,900 (Demo + integration prep)</li>
+        </ul>
+        <p class="note">Reply with option (A/B/C), use case, segment, and timeline.</p>
       </div>
     </div>
 

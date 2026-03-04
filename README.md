@@ -1,72 +1,40 @@
 # PersonaQuanta
 
-**Your life, quantified.**  
-**See your index. Change your trajectory.**
+**PersonaQuanta** is a **Pilot Blueprint Pack** for an entertainment-first “economic persona” experience:
+users answer a short questionnaire and receive **explainable indices** with **uncertainty ranges**, **confidence (CONF)**, and a safe **what-if** loop.
 
-PersonaQuanta is an entertainment-first “economic persona” scoring concept that turns user-provided inputs into explainable indices with confidence ranges (CONF) and instant what-if simulations — designed for fintech & insurance engagement.
+This project is positioned as a **methodology + blueprint** (not a production software delivery).
 
----
+## What this repo contains
 
-## What it outputs
+- `index.html` — public landing page (GitHub Pages)
+- `logo.png` — project logo used by the landing page
+- `PersonaQuanta_Executive_1Page_(Pilot_Blueprint_Pack).pdf` — executive overview (download)
+- `PersonaQuanta_Pilot_Offer_(Blueprint_Pack).pdf` — full pilot offer (download)
+- `PersonaQuanta_Sample_Report_(Illustrative).pdf` — sample report format (illustrative)
 
-- **NW** — Net Worth (range)
-- **LEP** — Lifetime Earnings Potential (range)
-- **SEV** — Stability & Expense Volatility (0–100)
-- **CS** — Composite Score (0–100)
-- **Alignment Score** — education track vs. actual role (explainable “fit” signal)
+## Scope (important)
 
-**Principles**
-- Pseudonym-first (no real name required)
-- Explainable outputs (“Top Drivers”)
-- Confidence + ranges (CONF)
-- What-if (3 scenarios)
-- Export-ready report (PDF/JSON)
+PersonaQuanta materials describe:
+- questionnaire schema
+- scoring + range construction rules
+- confidence logic (CONF) tied to input completeness/quality
+- explainable “top drivers” library
+- what-if flow specification
+- pilot measurement plan (drop-off / completion / time-to-first-value)
 
-> No financial advice. Entertainment-first. Ranges reflect uncertainty.
+This repo does **not** provide:
+- production software
+- integration into client systems
+- hosting / SLA
 
----
+## Compliance framing
 
-## Live site
+PersonaQuanta is an informational self-model based on user-provided inputs. Outputs are directional and uncertainty-aware.
+It is **not** an underwriting, eligibility, pricing, or credit decision engine and must not be used as the sole basis for such decisions.
 
-- GitHub Pages landing is enabled from this repository (see **Settings → Pages**).
+## Contact / Access
 
----
+Pilot Blueprint Pack / concept license is shared under NDA.
 
-## Downloads
-
-- **Executive 1-page PDF:** `PersonaQuanta_Pilot_offer_(v0.2)_exec.pdf`
-- **Full Pilot Offer PDF:** `PersonaQuanta_Pilot_offer_(v0.1).pdf`
-
----
-
-## Pilot availability
-
-**Pilot Blueprint / concept license under NDA.**  
-Delivery pack typically includes:
-- Questionnaire schema + scoring spec
-- Reference UX flow + demo script
-- Exportable report format (PDF/JSON)
-
----
-
-## Pricing (initial ask)
-
-- **Option A — Blueprint:** **$4,900**
-- **Option B — Blueprint + demo:** **$9,900**
-- **Option C — Demo + integration prep:** **$14,900**
-
----
-
-## Contact
-
-Email: **personaquanta@proton.me**
-
-Suggested email subject:
-- `PersonaQuanta — NDA Request`  
-- `PersonaQuanta — Pilot Offer Request`
-
-Include:
-- Company / Role / Country
-- Use case (onboarding, upsell, personalization, retention)
-- Target segment + user volume estimate
-- Timeline
+Email: personaquanta@proton.me

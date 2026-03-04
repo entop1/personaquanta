@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PersonaQuanta</title>
-  <meta name="description" content="PersonaQuanta — Your life, quantified. See your index. Change your trajectory." />
+  <meta name="description" content="PersonaQuanta — Your life, quantified. A pilot blueprint to increase onboarding completion via explainable indices with uncertainty." />
 
   <style>
     :root{
@@ -16,6 +16,7 @@
       --muted2:rgba(234,240,255,.58);
       --accent:#2AA7FF;
       --accent2:#00E0B8;
+      --warn: rgba(255,255,255,.10);
     }
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
@@ -29,7 +30,6 @@
         var(--bg);
       padding:56px 18px;
     }
-
     .wrap{max-width:980px;margin:0 auto}
 
     .nav{
@@ -40,7 +40,6 @@
       flex-wrap:wrap;
       margin-bottom:22px;
     }
-
     .brand{
       display:flex;
       align-items:center;
@@ -52,7 +51,6 @@
     .brand img{width:22px;height:22px;object-fit:contain;display:block}
     .dot{width:10px;height:10px;border-radius:99px;background:linear-gradient(135deg,var(--accent),var(--accent2))}
     .note{color:var(--muted2);font-size:13px}
-
     .navlinks{display:flex;gap:12px;flex-wrap:wrap}
     .navlinks a{
       color:rgba(234,240,255,.72);
@@ -81,14 +79,18 @@
 
     h1{font-size:52px;line-height:1.05;margin:0 0 10px}
     .tag{font-size:18px;color:var(--muted);margin:0 0 14px}
-    .small{font-size:13px;color:var(--muted2);margin-top:10px;max-width:72ch}
-
+    .small{font-size:13px;color:var(--muted2);margin-top:10px;max-width:76ch}
     .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+
     .btn{
-      display:inline-flex;align-items:center;gap:10px;
-      padding:12px 14px;border-radius:14px;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 14px;
+      border-radius:14px;
       border:1px solid var(--border);
-      color:var(--text);text-decoration:none;
+      color:var(--text);
+      text-decoration:none;
       background:rgba(255,255,255,.04);
       transition:transform .12s ease, border-color .12s ease, background .12s ease;
       white-space:nowrap;
@@ -108,8 +110,8 @@
 
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
     @media (max-width:900px){.grid{grid-template-columns:1fr}}
-
     h2{font-size:16px;letter-spacing:.2px;margin:0 0 10px}
+
     ul{margin:0;padding-left:18px;color:var(--muted)}
     li{margin:7px 0}
 
@@ -120,14 +122,25 @@
       outline:2px solid rgba(42,167,255,.55);
       box-shadow: 0 0 0 6px rgba(42,167,255,.10);
     }
-
-    /* nicer section rhythm */
     .spacer{height:14px}
 
-    /* make “download buttons” inside list look normal */
-    .linkbtn{
-      display:inline-flex;
-      margin-top:6px;
+    .linkbtn{ display:inline-flex; margin-top:6px; }
+
+    .callout{
+      margin-top:12px;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--warn);
+      background:rgba(255,255,255,.03);
+      color:rgba(234,240,255,.76);
+      font-size:13px;
+      max-width:80ch;
+    }
+    .callout b{color:rgba(234,240,255,.92)}
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px;
+      color:rgba(234,240,255,.70);
     }
   </style>
 
@@ -144,11 +157,10 @@
 
 <body>
   <div class="wrap">
-
     <div class="nav">
       <div class="brand">
         <img src="logo.png" alt="PersonaQuanta"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
         <span class="dot" style="display:none"></span>
         PersonaQuanta
       </div>
@@ -159,31 +171,30 @@
         <a href="#contact">Contact</a>
       </div>
 
-      <div class="note">Pilot Blueprint / concept license under NDA</div>
+      <div class="note">Pilot Blueprint Pack / concept license under NDA</div>
     </div>
 
     <div class="hero">
-
       <!-- LEFT: Sales hero -->
       <div class="card">
         <h1>Your life, quantified.</h1>
         <p class="tag"><b>See your index.</b> Change your trajectory.</p>
 
-        <p class="tag" style="max-width:66ch">
-          PersonaQuanta is an entertainment-first <b>“economic persona”</b> experience that turns user inputs into
-          explainable indices with <b>confidence ranges</b> and instant <b>what-if</b> exploration — built to increase
-          onboarding completion and engagement in fintech &amp; insurance.
+        <p class="tag" style="max-width:72ch">
+          PersonaQuanta is a <b>pilot blueprint pack</b> for an entertainment-first <b>“economic persona”</b> experience:
+          users answer a short questionnaire and receive <b>explainable indices</b> with <b>uncertainty ranges</b> and a safe <b>what-if</b> loop —
+          designed to increase onboarding completion and engagement in fintech &amp; insurance.
         </p>
 
         <div class="cta">
-          <a class="btn primary" href="#overview">View one-page overview</a>
+          <a class="btn primary" href="#overview">View executive overview</a>
 
           <a class="btn" href="mailto:personaquanta@proton.me?subject=PersonaQuanta%20%E2%80%94%20NDA%20Request&body=Hi%2C%0A%0AI%27d%20like%20to%20review%20PersonaQuanta%20under%20NDA.%0A%0ACompany%3A%0ARole%3A%0ACountry%3A%0AUse%20case%3A%0A%0AThanks.">
             Request NDA
           </a>
 
-          <a class="btn" href="mailto:personaquanta@proton.me?subject=PersonaQuanta%20%E2%80%94%20Pilot%20Offer%20Request&body=Hi%2C%0A%0AI%27d%20like%20a%20pilot%20offer%20outline%20for%20PersonaQuanta.%0A%0ACompany%3A%0ARole%3A%0ACountry%3A%0AUsers%20%28approx.%29%3A%0ATarget%20segment%3A%0ATimeline%3A%0A%0AThanks.">
-            Request Pilot Offer
+          <a class="btn" href="mailto:personaquanta@proton.me?subject=PersonaQuanta%20%E2%80%94%20Pilot%20Pack%20Request&body=Hi%2C%0A%0AI%27d%20like%20a%20pilot%20pack%20outline%20for%20PersonaQuanta.%0A%0ACompany%3A%0ARole%3A%0ACountry%3A%0ATarget%20segment%3A%0ATimeline%3A%0A%0AThanks.">
+            Request Pilot Pack
           </a>
         </div>
 
@@ -191,95 +202,112 @@
           <span class="pill">Pseudonym-first</span>
           <span class="pill">Explainable “Top Drivers”</span>
           <span class="pill">CONF + ranges</span>
-          <span class="pill">What-if scenarios</span>
+          <span class="pill">What-if exploration</span>
+          <span class="pill">Drop-off measurement</span>
+        </div>
+
+        <div class="callout">
+          <b>What you are buying:</b> a blueprint that your team can implement.
+          It includes the scoring spec, questionnaire schema, report template, demo script, and success metrics plan.
+          <div class="spacer"></div>
+          <span class="mono">Not a production software delivery. Not an underwriting or credit decision engine.</span>
         </div>
 
         <p class="small">
-          Built as a pilot-ready blueprint: scoring spec, questionnaire schema, demo script, and export formats.
-          No financial advice. Outputs are directional and uncertainty-aware.
+          PersonaQuanta outputs are <b>directional</b> and uncertainty-aware.
+          The report is an informational self-model based on user-provided inputs.
+          It does not determine eligibility, pricing, underwriting, or credit decisions.
         </p>
       </div>
 
-      <!-- RIGHT: What it outputs (kept tight) -->
+      <!-- RIGHT: What it outputs -->
       <div class="card">
-        <h2>What it outputs</h2>
+        <h2>What it outputs (examples)</h2>
         <ul>
-          <li><b>NW</b> — Net Worth (range)</li>
-          <li><b>LEP</b> — Lifetime Earnings Potential (range)</li>
-          <li><b>SEV</b> — Stability &amp; Expense Volatility (0–100)</li>
-          <li><b>CS</b> — Composite Score (0–100)</li>
+          <li><b>NW</b> — Net Worth <span class="mono">(range)</span></li>
+          <li><b>LEP</b> — Lifetime Earnings Potential <span class="mono">(range)</span></li>
+          <li><b>SEV</b> — Stability &amp; Expense Volatility <span class="mono">(0–100)</span></li>
+          <li><b>CS</b> — Composite Score <span class="mono">(0–100)</span></li>
         </ul>
 
         <div class="spacer"></div>
 
-        <h2>Where it fits</h2>
+        <h2>Why it’s useful</h2>
         <ul>
-          <li>Onboarding engagement layer (gamified, explainable)</li>
-          <li>Segmentation signal for personalization (bands, not claims)</li>
-          <li>Shareable export for internal review (PDF/JSON)</li>
+          <li>Turns form inputs into a story users want to finish</li>
+          <li>Makes uncertainty explicit (less “magic score”)</li>
+          <li>Enables safe what-if learning before commitment</li>
+          <li>Produces a shareable export (PDF/JSON format)</li>
         </ul>
 
-        <p class="small">
-          Pseudonym-first. No real name required. User-controlled inputs.
-          Not an underwriting or credit decision engine.
-        </p>
+        <div class="callout">
+          <b>Optional add-on (pre-sales only):</b> Web-based Logic Demonstrator
+          <div class="spacer"></div>
+          A standalone UX preview that demonstrates the input → drivers → what-if → export flow for evaluation.
+          <span class="mono">Not integrated into client systems. Not production software.</span>
+        </div>
       </div>
-
     </div>
 
-    <!-- MINI ONE-PAGER (non-duplicate) -->
     <div class="spacer"></div>
 
+    <!-- EXEC MINI ONE-PAGER -->
     <section class="card" id="overview">
       <h2>Executive mini one-pager</h2>
 
-      <p class="tag" style="margin-bottom:10px;max-width:76ch">
-        PersonaQuanta is an <b>explainable self-model</b> for users: a fast way to translate inputs into a narrative of
-        <b>drivers</b>, <b>trade-offs</b>, and <b>trajectory</b> — designed to motivate completion and action without claiming precision.
+      <p class="tag" style="margin-bottom:10px;max-width:80ch">
+        PersonaQuanta is an <b>explainable self-model</b> experience for users:
+        a fast way to translate inputs into a narrative of <b>drivers</b>, <b>trade-offs</b>, and <b>trajectory</b> —
+        built to increase completion by giving users a reason to finish the flow.
       </p>
 
-      <h2 style="margin-top:14px">Why this works (behavioral)</h2>
+      <h2 style="margin-top:14px">What the pilot measures</h2>
       <ul>
-        <li><b>Reduces form fatigue</b> by turning inputs into a story users want to finish.</li>
-        <li><b>Makes uncertainty explicit</b>, increasing trust vs. “mystery scores”.</li>
-        <li><b>Creates a safe what-if loop</b>: users learn consequences before committing.</li>
+        <li><b>Drop-off by step</b> (where users quit)</li>
+        <li><b>Completion rate</b> (finish the questionnaire)</li>
+        <li><b>Time-to-first-value</b> (first meaningful output)</li>
+        <li><b>What-if engagement</b> (did users explore trade-offs)</li>
       </ul>
 
-      <h2 style="margin-top:14px">90-second demo flow</h2>
+      <h2 style="margin-top:14px">90-second flow (reference)</h2>
       <ol style="margin:0;padding-left:18px;color:var(--muted)">
         <li><b>Input</b>: a short questionnaire (pseudonym-first).</li>
-        <li><b>Drivers</b>: top 3 drivers + 1 constraint, in plain language.</li>
-        <li><b>One what-if</b>: tweak one variable → see direction + confidence change.</li>
-        <li><b>Export</b>: shareable PDF/JSON summary for personal or internal use.</li>
+        <li><b>Drivers</b>: top drivers + constraints, plain language.</li>
+        <li><b>One what-if</b>: tweak one variable → direction + confidence change.</li>
+        <li><b>Export</b>: shareable summary in PDF/JSON format (template).</li>
       </ol>
 
       <p class="small">
-        If you want the full pilot pack, see Downloads below or request it under NDA.
+        Full pilot pack is available under NDA. See Downloads below.
       </p>
     </section>
 
-    <!-- SUPPORTING (kept concise) -->
+    <!-- SUPPORTING -->
     <div class="grid">
       <div class="card">
         <h2>What-if scenarios (examples)</h2>
         <ul>
           <li>Income shock vs. income growth</li>
-          <li>Debt-to-income improvement plan</li>
+          <li>Debt-to-income improvement path</li>
           <li>Coverage level &amp; deductible impact</li>
         </ul>
       </div>
 
       <div class="card">
-        <h2>Delivery for a pilot</h2>
+        <h2>Pilot delivery (Blueprint-only)</h2>
         <ul>
           <li>Questionnaire schema + scoring spec</li>
-          <li>Reference UX flow + demo script</li>
-          <li>Exportable report format (PDF/JSON)</li>
+          <li>Driver logic + confidence rules (explainable)</li>
+          <li>Report template + export format (PDF/JSON)</li>
+          <li>Success metrics plan (drop-off &amp; completion)</li>
         </ul>
+        <p class="small">
+          Optional: a standalone logic demonstrator may be provided for evaluation UX preview (non-integrated).
+        </p>
       </div>
     </div>
 
-    <!-- DOWNLOADS (single place) -->
+    <!-- DOWNLOADS + CONTACT -->
     <div class="grid">
       <div class="card" id="downloads">
         <h2>Downloads</h2>
@@ -302,16 +330,26 @@
         <h2>Contact</h2>
         <ul>
           <li><b>Email:</b> personaquanta@proton.me</li>
-          <li><b>LinkedIn:</b> <a href="https://www.linkedin.com/in/personaquanta/" target="_blank" rel="noopener" style="color:rgba(234,240,255,.82)">personaquanta</a></li>
-          <li><b>Availability:</b> Pilot Blueprint / concept license under NDA</li>
-          <li><b>Suggested pricing:</b> $4,900 (Blueprint) / $9,900 (Blueprint + demo) / $14,900 (Demo + integration prep)</li>
+          <li><b>LinkedIn:</b>
+            <a href="https://www.linkedin.com/in/personaquanta/" target="_blank" rel="noopener" style="color:rgba(234,240,255,.82)">
+              personaquanta
+            </a>
+          </li>
+          <li><b>Status:</b> Pilot Blueprint Pack / concept license under NDA</li>
         </ul>
-        <p class="small">Reply with option (A/B/C), use case, segment, and timeline.</p>
+
+        <div class="callout">
+          <b>Commercial note:</b> terms and pricing are shared under NDA to avoid mismatched expectations.
+          Reply with target segment and timeline to receive the right pilot outline.
+        </div>
+
+        <p class="small">
+          This page describes a blueprint and evaluation materials. It does not offer production software or integration services.
+        </p>
       </div>
     </div>
 
     <div class="footer">© PersonaQuanta. All rights reserved.</div>
-
   </div>
 </body>
 </html>

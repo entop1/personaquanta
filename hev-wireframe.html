@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>HEV — Human Economic Value · Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080B10;
+    --surf: #0E1319;
+    --surf2: #141B24;
+    --surf3: #1C2530;
+    --bdr: #1E2D3D;
+    --text: #E8F0F8;
+    --muted: #6B8099;
+    --muted2: #3D5166;
+    --acc: #00D4FF;
+    --acc2: #00FF88;
+    --acc3: #FF6B35;
+    --gold: #FFD166;
+    --red: #FF4757;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+    --r: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0A0E15;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    font-family: var(--sans);
+    color: var(--text);
+    padding: 32px 16px 60px;
+  }
+
+  /* DESKTOP FRAME LABEL */
+  .frame-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted2);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  /* PHONE SHELL */
+  .phone {
+    width: 375px;
+    min-height: 812px;
+    background: var(--bg);
+    border-radius: 44px;
+    border: 2px solid var(--bdr);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 1px #000, 0 40px 80px rgba(0,0,0,.7), 0 0 60px rgba(0,212,255,.04);
+  }
+
+  /* NOTCH */
+  .notch {
+    width: 120px;
+    height: 30px;
+    background: #000;
+    border-radius: 0 0 20px 20px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* STATUS BAR */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 24px 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  /* SCREENS */
+  .screen {
+    display: none;
+    padding: 0 24px 100px;
+    animation: fadeIn .25s ease;
+    min-height: 750px;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* PROGRESS */
+  .progress-bar {
+    height: 2px;
+    background: var(--surf3);
+    margin: 16px 24px 0;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--acc), var(--acc2));
+    border-radius: 2px;
+    transition: width .4s ease;
+  }
+
+  /* BLOCK BADGE */
+  .block-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .1em;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+  .block-badge.nw { background: rgba(0,212,255,.08); color: var(--acc); border: 1px solid rgba(0,212,255,.2); }
+  .block-badge.lep { background: rgba(0,255,136,.08); color: var(--acc2); border: 1px solid rgba(0,255,136,.2); }
+  .block-badge.result { background: rgba(255,209,102,.08); color: var(--gold); border: 1px solid rgba(255,209,102,.2); }
+
+  /* STEP COUNTER */
+  .step-counter {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--muted2);
+    letter-spacing: .1em;
+    margin-bottom: 6px;
+  }
+
+  /* SCREEN TITLE */
+  .screen-title {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 6px;
+    letter-spacing: -.02em;
+  }
+  .screen-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+
+  /* INPUT */
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: .1em;
+    margin-bottom: 6px;
+  }
+  .field input, .field select {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--surf2);
+    border: 1px solid var(--bdr);
+    border-radius: var(--r);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    outline: none;
+    transition: border-color .2s;
+    appearance: none;
+  }
+  .field input:focus, .field select:focus { border-color: var(--acc); }
+  .field input::placeholder { color: var(--muted2); }
+
+  /* ALIAS PREVIEW */
+  .alias-preview {
+    background: var(--surf2);
+    border: 1px solid var(--bdr);
+    border-radius: var(--r);
+    padding: 14px 16px;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .alias-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--acc), var(--acc2));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: var(--bg);
+    flex-shrink: 0;
+  }
+  .alias-name { font-weight: 700; font-size: 15px; }
+  .alias-hint { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+  /* OPTION CARDS */
+  .options-grid { display: grid; gap: 10px; }
+  .option-card {
+    padding: 14px 16px;
+    background: var(--surf2);
+    border: 1px solid var(--bdr);
+    border-radius: var(--r);
+    cursor: pointer;
+    transition: all .2s;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .option-card:hover, .option-card.selected {
+    border-color: var(--acc);
+    background: rgba(0,212,255,.06);
+  }
+  .option-card .opt-icon { font-size: 18px; flex-shrink: 0; }
+  .option-card .opt-label { font-weight: 600; font-size: 14px; }
+  .option-card .opt-sub { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+  .option-card .check {
+    margin-left: auto;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--bdr);
+    flex-shrink: 0;
+    transition: all .2s;
+  }
+  .option-card.selected .check {
+    background: var(--acc);
+    border-color: var(--acc);
+  }
+
+  /* RANGE SLIDER */
+  .range-wrap { padding: 8px 0; }
+  .range-labels { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--muted); margin-bottom: 6px; }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%; height: 4px;
+    background: var(--surf3);
+    border-radius: 2px; outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--acc);
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0,212,255,.4);
+  }
+  .range-value {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 22px;
+    color: var(--acc);
+    font-weight: 700;
+    margin-top: 10px;
+  }
+
+  /* TOGGLE */
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--surf2);
+    border: 1px solid var(--bdr);
+    border-radius: var(--r);
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .toggle-info .t-label { font-weight: 600; font-size: 14px; }
+  .toggle-info .t-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .toggle-switch {
+    width: 44px; height: 24px;
+    background: var(--surf3);
+    border-radius: 12px;
+    position: relative;
+    transition: background .2s;
+    flex-shrink: 0;
+  }
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--muted2);
+    transition: all .2s;
+  }
+  .toggle-row.on .toggle-switch { background: rgba(0,212,255,.3); }
+  .toggle-row.on .toggle-switch::after { left: 23px; background: var(--acc); }
+
+  /* SEVERITY CHIPS */
+  .severity-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--bdr);
+    background: var(--surf2);
+    color: var(--muted);
+    transition: all .2s;
+  }
+  .chip.none.sel { border-color: var(--acc2); color: var(--acc2); background: rgba(0,255,136,.08); }
+  .chip.mild.sel { border-color: var(--gold); color: var(--gold); background: rgba(255,209,102,.08); }
+  .chip.moderate.sel { border-color: var(--acc3); color: var(--acc3); background: rgba(255,107,53,.08); }
+  .chip.severe.sel { border-color: var(--red); color: var(--red); background: rgba(255,71,87,.08); }
+
+  /* RESULT SCREEN */
+  .hev-score-ring {
+    width: 160px; height: 160px;
+    margin: 20px auto;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hev-score-ring svg { position: absolute; top: 0; left: 0; }
+  .hev-score-inner { text-align: center; position: relative; z-index: 1; }
+  .hev-score-num {
+    font-family: var(--mono);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .hev-score-label { font-size: 11px; color: var(--muted); margin-top: 4px; letter-spacing: .05em; }
+
+  .indices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+  .index-card {
+    background: var(--surf2);
+    border: 1px solid var(--bdr);
+    border-radius: var(--r);
+    padding: 14px;
+  }
+  .index-card .idx-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: .1em; margin-bottom: 6px; }
+  .index-card .idx-value { font-family: var(--mono); font-size: 20px; font-weight: 700; }
+  .index-card .idx-range { font-size: 10px; color: var(--muted); margin-top: 2px; font-family: var(--mono); }
+  .index-card.nw-card .idx-value { color: var(--acc); }
+  .index-card.lep-card .idx-value { color: var(--acc2); }
+  .index-card.sev-card .idx-value { color: var(--acc3); }
+  .index-card.conf-card .idx-value { color: var(--gold); }
+
+  .conf-bar-wrap { margin: 4px 0 16px; }
+  .conf-bar-label { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--muted); margin-bottom: 6px; }
+  .conf-bar { height: 6px; background: var(--surf3); border-radius: 3px; overflow: hidden; }
+  .conf-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--acc3), var(--gold), var(--acc2)); }
+
+  .drivers-list { margin-top: 16px; }
+  .drivers-list .dl-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: .1em; margin-bottom: 10px; }
+  .driver-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .driver-row .dr-name { font-size: 13px; flex: 1; }
+  .driver-row .dr-bar-wrap { width: 100px; height: 4px; background: var(--surf3); border-radius: 2px; overflow: hidden; }
+  .driver-row .dr-bar { height: 100%; border-radius: 2px; }
+  .driver-row .dr-val { font-family: var(--mono); font-size: 11px; color: var(--muted); width: 36px; text-align: right; }
+
+  .what-if-banner {
+    background: var(--surf2);
+    border: 1px solid rgba(0,255,136,.2);
+    border-radius: var(--r);
+    padding: 14px 16px;
+    margin-top: 16px;
+    display: flex; align-items: center; gap: 12px;
+    cursor: pointer;
+  }
+  .what-if-banner .wi-icon { font-size: 20px; }
+  .what-if-banner .wi-text { font-size: 13px; }
+  .what-if-banner .wi-text strong { display: block; color: var(--acc2); font-size: 14px; margin-bottom: 2px; }
+  .wi-arrow { margin-left: auto; color: var(--acc2); font-size: 16px; }
+
+  /* BTN */
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    background: var(--acc);
+    border: none;
+    border-radius: var(--r);
+    color: var(--bg);
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .2s, transform .1s;
+    margin-top: 8px;
+  }
+  .btn-primary:active { transform: scale(.98); opacity: .9; }
+  .btn-primary.green { background: var(--acc2); }
+  .btn-primary.gold { background: var(--gold); }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 1px solid var(--bdr);
+    border-radius: var(--r);
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all .2s;
+  }
+  .btn-secondary:hover { border-color: var(--muted); color: var(--text); }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 16px 24px 32px;
+    background: linear-gradient(transparent, var(--bg) 40%);
+  }
+
+  /* BACK BTN */
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: none; border: none;
+    color: var(--muted); font-family: var(--sans); font-size: 13px;
+    cursor: pointer; padding: 16px 0 8px;
+  }
+
+  /* DIVIDER */
+  .block-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 24px 0 20px;
+  }
+  .block-divider::before, .block-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--bdr);
+  }
+  .block-divider span { font-family: var(--mono); font-size: 9px; color: var(--muted2); letter-spacing: .1em; white-space: nowrap; }
+
+  /* CALCULATING */
+  .calculating {
+    text-align: center;
+    padding: 60px 0;
+  }
+  .calc-spinner {
+    width: 60px; height: 60px;
+    border: 3px solid var(--surf3);
+    border-top-color: var(--acc);
+    border-radius: 50%;
+    margin: 0 auto 24px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .calc-label { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: .1em; }
+  .calc-steps { margin-top: 20px; }
+  .calc-step { font-size: 13px; color: var(--muted2); padding: 6px 0; font-family: var(--mono); font-size: 11px; }
+  .calc-step.done { color: var(--acc2); }
+  .calc-step.active { color: var(--text); }
+
+  /* FLOW MAP */
+  .flow-map {
+    background: rgba(0,0,0,.3);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted2);
+    line-height: 1.8;
+    letter-spacing: .05em;
+  }
+  .flow-map .current { color: var(--acc); font-weight: 700; }
+  .flow-map .done-step { color: var(--acc2); }
+  .flow-map .upcoming { color: var(--muted2); }
+
+  /* COMPLIANCE NOTE */
+  .compliance-note {
+    background: rgba(255,71,87,.04);
+    border: 1px solid rgba(255,71,87,.12);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-top: 16px;
+  }
+  .compliance-note strong { color: var(--acc3); display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .05em; font-family: var(--mono); }
+
+  /* OUTER LABEL */
+  .outer-nav {
+    width: 375px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 0 4px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted2);
+  }
+  .screen-dots { display: flex; gap: 6px; }
+  .dot { width: 6px; height: 6px; border-radius: 3px; background: var(--surf3); transition: all .3s; }
+  .dot.active { width: 18px; background: var(--acc); }
+  .dot.done { background: var(--acc2); }
+</style>
+</head>
+<body>
+
+<div class="frame-label">HEV · Human Economic Value · Interactive Prototype · 375px Mobile</div>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>●●●●● WiFi ■■■</span>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress" style="width:0%"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 0 — WELCOME
+  ════════════════════════════════════════ -->
+  <div class="screen active" id="s0">
+    <div style="padding-top:40px;text-align:center;">
+      <div style="width:72px;height:72px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(0,255,136,.1));border:1px solid rgba(0,212,255,.3);border-radius:20px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <polygon points="18,2 34,10 34,26 18,34 2,26 2,10" stroke="#00D4FF" stroke-width="1.5" fill="none"/>
+          <text x="18" y="23" text-anchor="middle" font-family="Space Mono" font-size="11" font-weight="700" fill="#00D4FF">HEV</text>
+        </svg>
+      </div>
+      <h1 style="font-size:28px;font-weight:800;letter-spacing:-.03em;margin-bottom:10px;">Human Economic<br>Value</h1>
+      <p style="color:var(--muted);font-size:14px;line-height:1.6;max-width:280px;margin:0 auto 32px;">Understand your economic persona — Net Worth range, life potential, and social-economic value with confidence intervals.</p>
+
+      <div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:var(--r);padding:16px;text-align:left;margin-bottom:20px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.1em;margin-bottom:12px;">YOU WILL RECEIVE</div>
+        <div style="display:grid;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;"><span style="color:var(--acc);font-size:16px;">◈</span> Net Worth Range (NW)</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;"><span style="color:var(--acc2);font-size:16px;">◈</span> Life Economic Potential (LEP)</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;"><span style="color:var(--acc3);font-size:16px;">◈</span> Social-Economic Value (SEV)</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;"><span style="color:var(--gold);font-size:16px;">◈</span> Confidence Score (CONF)</div>
+        </div>
+      </div>
+
+      <div class="compliance-note">
+        <strong>⚠ NOT FOR ELIGIBILITY USE</strong>
+        This tool is for engagement and education only. Results are not used for credit, underwriting, insurance pricing, or any eligibility determination.
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="btn-primary" onclick="goTo(1)">Begin Assessment →</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 1 — ALIAS
+  ════════════════════════════════════════ -->
+  <div class="screen" id="s1">
+    <button class="back-btn" onclick="goTo(0)">← Back</button>
+    <div class="block-badge nw">⬡ BLOCK 1 · NET WORTH</div>
+    <div class="step-counter">STEP 1 OF 7</div>
+    <div class="screen-title">Choose your<br>alias</div>
+    <div class="screen-sub">Your real name is never stored. Pick a pseudonym for this session.</div>
+
+    <div class="field">
+      <label>ALIAS / PSEUDONYM</label>
+      <input type="text" id="alias-input" placeholder="e.g. Navigator77" oninput="updateAlias(this.value)" maxlength="24" />
+    </div>
+
+    <div class="alias-preview" id="alias-preview">
+      <div class="alias-avatar" id="alias-av">?</div>
+      <div>
+        <div class="alias-name" id="alias-name-disp">Your alias</div>
+        <div class="alias-hint">ANONYMOUS · SESSION ONLY</div>
+      </div>
+    </div>
+
+    <div class="flow-map" style="margin-top:24px;">
+      <div class="current">→ Alias</div>
+      <div class="upcoming">· Country · Age · Education · Income · Assets · Debts</div>
+      <div style="margin-top:6px;color:var(--muted2);">──────────────────</div>
+      <div class="upcoming">· Health · Insurance · Contract · LEP/SEV Result</div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="btn-primary" onclick="goTo(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 2 — COUNTRY + AGE
+  ════════════════════════════════════════ -->
+  <div class="screen" id="s2">
+    <button class="back-btn" onclick="goTo(1)">← Back</button>
+    <div class="block-badge nw">⬡ BLOCK 1 · NET WORTH</div>
+    <div class="step-counter">STEP 2 OF 7</div>
+    <div class="screen-title">Location &<br>Age</div>
+    <div class="screen-sub">Used to apply regional median benchmarks for NW calculation.</div>
+
+    <div class="field">
+      <label>COUNTRY</label>
+      <select>
+        <option>United States</option>
+        <option>United Kingdom</option>
+        <option>Canada</option>
+        <option>Australia</option>
+        <option>Germany</option>
+        <option>Ukraine</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="field" style="margin-top:8px;">
+      <label>AGE RANGE</label>
+      <div class="options-grid" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="option-card" style="flex-direction:column;align-items:center;padding:12px 8px;" onclick="selectOpt(this,'age')">
+          <span style="font-weight:700;font-size:15px;">18–24</span>
+        </div>
+        <div class="option-card" style="flex-direction:column;align-items:center;padding:12px 8px;" onclick="selectOpt(this,'age')">
+          <span style="font-weight:700;font-size:15px;">25–34</span>
+        </div>
+        <div class="option-card selected" style="flex-direction:column;align-items:center;padding:12px 8px;" onclick="selectOpt(this,'age')">
+          <span style="font-weight:700;font-size:15px;">35–44</span>
+        </div>
+        <div class="option-card" style="flex-direction:column;align-items:center;padding:12px 8px;" onclick="selectOpt(this,'age')">
+          <span style="font-weight:700;font-size:15px;">45–54</span>
+        </div>
+        <div class="option-card" style="flex-direction:column;align-items:center;padding:12px 8px;" onclick="selectOpt(this,'age')">
+          <span style="font-weight:700;font-size:15px;">55–64</span>
+        </div>
+        <div class="option-card" style="flex-direction:column;align-items:center;padding:12px 8px;" onclick="selectOpt(this,'age')">
+          <span style="font-weight:700;font-size:15px;">65+</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="btn-primary" onclick="goTo(3)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 3 — EDUCATION + INCOME
+  ════════════════════════════════════════ -->
+  <div class="screen" id="s3">
+    <button class="back-btn" onclick="goTo(2)">← Back</button>
+    <div class="block-badge nw">⬡ BLOCK 1 · NET WORTH</div>
+    <div class="step-counter">STEP 3 OF 7</div>
+    <div class="screen-title">Education &<br>Income</div>
+    <div class="screen-sub">Approximate ranges only. No exact figures stored.</div>
+
+    <div class="field">
+      <label>EDUCATION LEVEL</label>
+      <div class="options-grid">
+        <div class="option-card" onclick="selectOpt(this,'edu')">
+          <span class="opt-icon">🎓</span>
+          <div><div class="opt-label">High School</div></div>
+          <div class="check"></div>
+        </div>
+        <div class="option-card" onclick="selectOpt(this,'edu')">
+          <span class="opt-icon">🏫</span>
+          <div><div class="opt-label">Some College</div></div>
+          <div class="check"></div>
+        </div>
+        <div class="option-card selected" onclick="selectOpt(this,'edu')">
+          <span class="opt-icon">📘</span>
+          <div><div class="opt-label">Bachelor's</div></div>
+          <div class="check"></div>
+        </div>
+        <div class="option-card" onclick="selectOpt(this,'edu')">
+          <span class="opt-icon">📗</span>
+          <div><div class="opt-label">Master's / MBA</div></div>
+          <div class="check"></div>
+        </div>
+        <div class="option-card" onclick="selectOpt(this,'edu')">
+          <span class="opt-icon">🔬</span>
+          <div><div class="opt-label">PhD / Doctorate</div></div>
+          <div class="check"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:16px;">
+      <label>ANNUAL HOUSEHOLD INCOME (USD RANGE)</label>
+      <div class="range-wrap">
+        <div class="range-labels"><span>$0</span><span>$500k+</span></div>
+        <input type="range" min="0" max="10" value="4" id="income-slider" oninput="updateIncome(this.value)">
+        <div class="range-value" id="income-val">$75k – $100k</div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="btn-primary" onclick="goTo(4)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 4 — ASSETS + DEBTS
+  ════════════════════════════════════════ -->
+  <div class="screen" id="s4">
+    <button class="back-btn" onclick="goTo(3)">← Back</button>
+    <div class="block-badge nw">⬡ BLOCK 1 · NET WORTH</div>
+    <div class="step-counter">STEP 4 OF 7</div>
+    <div class="screen-title">Assets &<br>Debts</div>
+    <div class="screen-sub">Rough buckets — precision not required. We calculate a range, not an exact number.</div>
+
+    <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px;">TOTAL ASSETS (incl. property, savings, investments)</div>
+    <div class="options-grid" style="grid-template-columns:1fr 1fr;">
+      <div class="option-card" style="flex-direction:column;align-items:flex-start;" onclick="selectOpt(this,'assets')">
+        <span style="font-family:var(--mono);font-weight:700;color:var(--acc);font-size:14px;">< $25k</span>
+      </div>
+      <div class="option-card" style="flex-direction:column;align-items:flex-start;" onclick="selectOpt(this,'assets')">
+        <span style="font-family:var(--mono);font-weight:700;color:var(--acc);font-size:14px;">$25k–$100k</span>
+      </div>
+      <div class="option-card selected" style="flex-direction:column;align-items:flex-start;" onclick="selectOpt(this,'assets')">
+        <span style="font-family:var(--mono);font-weight:700;color:var(--acc);font-size:14px;">$100k–$500k</span>
+      </div>
+      <div class="option-card" style="flex-direction:column;align-items:flex-start;" onclick="selectOpt(this,'assets')">
+        <span style="font-family:var(--mono);font-weight:700;color:var(--acc);font-size:14px;">$500k–$2M</span>
+      </div>
+      <div class="option-card" style="flex-direction:column;align-items:flex-start;grid-column:span 2;" onclick="selectOpt(this,'assets')">
+        <span style="font-family:var(--mono);font-weight:700;color:var(--acc);font-size:14px;">$2M+</span>
+      </div>
+    </div>
+
+    <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.1em;margin:16px 0 10px;">TOTAL DEBTS (mortgage, loans, credit cards)</div>
+    <div class="options-grid" style="grid-template-columns:1fr 1fr;">
+      <div class="option-card selected" style="flex-direction:column;align-items:flex-start;" onclick="selectOpt(this,'debts')">
+        <span style="font-family:var(--mono);font-weight:700;color:var(--red);font-size:14px;">< $10k</span>
+      </div>
+      <div class="option-card" style="flex-direction:column;align-items:flex-start;" onclick="selectOpt(this,'debts')">
+        <span style="font-family:var(--mono);font-weight:700;color:var(--red);font-size:14px;">$10k–$50k</span>
+      </div>
+      <div class="option-card" style="flex-direction:column;align-items:flex-start;" onclick="selectOpt(this,'debts')">
+        <span style="font-family:var(--mono);font-weight:700;color:var(--red);font-size:14px;">$50k–$200k</span>
+      </div>
+      <div class="option-card" style="flex-direction:column;align-items:flex-start;" onclick="selectOpt(this,'debts')">
+        <span style="font-family:var(--mono);font-weight:700;color:var(--red);font-size:14px;">$200k+</span>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="btn-primary" onclick="goTo(5)">Continue → Block 2</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 5 — HEALTH / LEP BLOCK
+  ════════════════════════════════════════ -->
+  <div class="screen" id="s5">
+    <button class="back-btn" onclick="goTo(4)">← Back</button>
+
+    <div class="block-divider"><span>NW COMPLETE · BLOCK 2 STARTING</span></div>
+
+    <div class="block-badge lep">◉ BLOCK 2 · LEP / SEV</div>
+    <div class="step-counter">STEP 5 OF 7</div>
+    <div class="screen-title">Health &<br>Lifestyle</div>
+    <div class="screen-sub">Affects Life Economic Potential — how long and productively you can generate economic value.</div>
+
+    <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px;">SUBSTANCE USE / DEPENDENCIES</div>
+    <div class="severity-chips">
+      <div class="chip none sel" onclick="selectChip(this,'subs')">None</div>
+      <div class="chip mild" onclick="selectChip(this,'subs')">Mild</div>
+      <div class="chip moderate" onclick="selectChip(this,'subs')">Moderate</div>
+      <div class="chip severe" onclick="selectChip(this,'subs')">Severe</div>
+    </div>
+
+    <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.1em;margin:16px 0 10px;">CHRONIC CONDITIONS</div>
+    <div class="severity-chips">
+      <div class="chip none sel" onclick="selectChip(this,'chronic')">None</div>
+      <div class="chip mild" onclick="selectChip(this,'chronic')">1–2 Managed</div>
+      <div class="chip moderate" onclick="selectChip(this,'chronic')">Multiple</div>
+      <div class="chip severe" onclick="selectChip(this,'chronic')">Severe Impact</div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px;">EMPLOYMENT & COVERAGE</div>
+      <div class="toggle-row on" onclick="this.classList.toggle('on')">
+        <div class="toggle-info">
+          <div class="t-label">Health Insurance</div>
+          <div class="t-sub">Employer or private coverage</div>
+        </div>
+        <div class="toggle-switch"></div>
+      </div>
+      <div class="toggle-row on" onclick="this.classList.toggle('on')">
+        <div class="toggle-info">
+          <div class="t-label">Formal Employment Contract</div>
+          <div class="t-sub">Full-time / part-time with contract</div>
+        </div>
+        <div class="toggle-switch"></div>
+      </div>
+      <div class="toggle-row" onclick="this.classList.toggle('on')">
+        <div class="toggle-info">
+          <div class="t-label">Retirement / Pension Plan</div>
+          <div class="t-sub">401k, pension, or equivalent</div>
+        </div>
+        <div class="toggle-switch"></div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="btn-primary green" onclick="goTo(6)">Calculate HEV →</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 6 — CALCULATING
+  ════════════════════════════════════════ -->
+  <div class="screen" id="s6">
+    <div class="calculating">
+      <div class="calc-spinner" id="calc-spinner"></div>
+      <div class="calc-label">COMPUTING YOUR HEV PROFILE</div>
+      <div class="calc-steps" id="calc-steps">
+        <div class="calc-step active" id="cs1">→ Applying regional benchmarks...</div>
+        <div class="calc-step" id="cs2">· Computing NW range...</div>
+        <div class="calc-step" id="cs3">· Calculating LEP factors...</div>
+        <div class="calc-step" id="cs4">· Deriving SEV index...</div>
+        <div class="calc-step" id="cs5">· Generating confidence score...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 7 — RESULT
+  ════════════════════════════════════════ -->
+  <div class="screen" id="s7">
+    <div class="block-badge result" style="margin-top:20px;">★ HEV RESULT · NAVIGATOR77</div>
+
+    <div class="hev-score-ring">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle cx="80" cy="80" r="68" stroke="#1C2530" stroke-width="8" fill="none"/>
+        <circle cx="80" cy="80" r="68" stroke="url(#grad)" stroke-width="8" fill="none"
+          stroke-dasharray="340" stroke-dashoffset="85" stroke-linecap="round"
+          transform="rotate(-90 80 80)"/>
+        <defs>
+          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#00D4FF"/>
+            <stop offset="50%" stop-color="#FFD166"/>
+            <stop offset="100%" stop-color="#00FF88"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="hev-score-inner">
+        <div class="hev-score-num">74</div>
+        <div class="hev-score-label">HEV INDEX</div>
+      </div>
+    </div>
+
+    <div class="indices-grid">
+      <div class="index-card nw-card">
+        <div class="idx-label">NET WORTH</div>
+        <div class="idx-value">$148k</div>
+        <div class="idx-range">Range: $90k – $210k</div>
+      </div>
+      <div class="index-card lep-card">
+        <div class="idx-label">LEP SCORE</div>
+        <div class="idx-value">81</div>
+        <div class="idx-range">Above median</div>
+      </div>
+      <div class="index-card sev-card">
+        <div class="idx-label">SEV INDEX</div>
+        <div class="idx-value">68</div>
+        <div class="idx-range">Moderate-high</div>
+      </div>
+      <div class="index-card conf-card">
+        <div class="idx-label">CONFIDENCE</div>
+        <div class="idx-value">73%</div>
+        <div class="idx-range">CONF score</div>
+      </div>
+    </div>
+
+    <div class="conf-bar-wrap">
+      <div class="conf-bar-label">
+        <span>Confidence interval</span>
+        <span style="color:var(--gold);">73% · MODERATE-HIGH</span>
+      </div>
+      <div class="conf-bar"><div class="conf-fill" style="width:73%"></div></div>
+    </div>
+
+    <div class="drivers-list">
+      <div class="dl-label">TOP DRIVERS</div>
+      <div class="driver-row">
+        <span class="dr-name">Education level</span>
+        <div class="dr-bar-wrap"><div class="dr-bar" style="width:85%;background:var(--acc);"></div></div>
+        <span class="dr-val">+85%</span>
+      </div>
+      <div class="driver-row">
+        <span class="dr-name">Health coverage</span>
+        <div class="dr-bar-wrap"><div class="dr-bar" style="width:72%;background:var(--acc2);"></div></div>
+        <span class="dr-val">+72%</span>
+      </div>
+      <div class="driver-row">
+        <span class="dr-name">Asset base</span>
+        <div class="dr-bar-wrap"><div class="dr-bar" style="width:61%;background:var(--acc);"></div></div>
+        <span class="dr-val">+61%</span>
+      </div>
+      <div class="driver-row">
+        <span class="dr-name">Debt ratio</span>
+        <div class="dr-bar-wrap"><div class="dr-bar" style="width:24%;background:var(--acc3);"></div></div>
+        <span class="dr-val">–24%</span>
+      </div>
+    </div>
+
+    <div class="what-if-banner">
+      <span class="wi-icon">⚡</span>
+      <div class="wi-text">
+        <strong>What-If Explorer</strong>
+        See how paying down debt or adding a retirement plan changes your HEV
+      </div>
+      <span class="wi-arrow">→</span>
+    </div>
+
+    <div class="compliance-note" style="margin-bottom:100px;">
+      <strong>⚠ EDUCATIONAL USE ONLY</strong>
+      This result is a statistical estimate for engagement purposes only. Not used for eligibility, pricing, underwriting, or credit decisions.
+    </div>
+
+    <div class="bottom-nav">
+      <button class="btn-primary gold" onclick="goTo(0)">Start New Assessment</button>
+      <button class="btn-secondary">Export Summary PDF</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- SCREEN DOTS NAV -->
+<div class="outer-nav">
+  <span id="screen-label">Welcome</span>
+  <div class="screen-dots" id="dots">
+    <div class="dot active" id="d0"></div>
+    <div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
+    <div class="dot" id="d4"></div>
+    <div class="dot" id="d5"></div>
+    <div class="dot" id="d6"></div>
+    <div class="dot" id="d7"></div>
+  </div>
+  <span id="screen-num">0 / 7</span>
+</div>
+
+<script>
+const SCREENS = ['Welcome','Alias','Location & Age','Education & Income','Assets & Debts','Health & LEP','Calculating...','HEV Result'];
+const PROGRESS = [0, 12, 25, 40, 55, 70, 88, 100];
+let current = 0;
+
+function goTo(n) {
+  document.getElementById('s' + current).classList.remove('active');
+  document.getElementById('d' + current).classList.remove('active');
+  if (current < n) document.getElementById('d' + current).classList.add('done');
+
+  current = n;
+  document.getElementById('s' + current).classList.add('active');
+
+  // Update progress
+  document.getElementById('progress').style.width = PROGRESS[n] + '%';
+
+  // Update dots
+  document.getElementById('d' + n).classList.remove('done');
+  document.getElementById('d' + n).classList.add('active');
+
+  // Update label
+  document.getElementById('screen-label').textContent = SCREENS[n];
+  document.getElementById('screen-num').textContent = n + ' / 7';
+
+  // Calculating animation
+  if (n === 6) runCalculation();
+}
+
+function runCalculation() {
+  const steps = [1,2,3,4,5];
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i > 0) {
+      document.getElementById('cs' + i).classList.remove('active');
+      document.getElementById('cs' + i).classList.add('done');
+      document.getElementById('cs' + i).textContent = '✓ ' + document.getElementById('cs' + i).textContent.replace('→ ','').replace('· ','');
+    }
+    i++;
+    if (i <= 5) {
+      document.getElementById('cs' + i).classList.add('active');
+    }
+    if (i > 5) {
+      clearInterval(interval);
+      setTimeout(() => goTo(7), 600);
+    }
+  }, 700);
+}
+
+function updateAlias(val) {
+  const name = val || 'Your alias';
+  document.getElementById('alias-name-disp').textContent = name;
+  document.getElementById('alias-av').textContent = val ? val[0].toUpperCase() : '?';
+}
+
+const INCOME_LABELS = ['< $20k','$20k–$40k','$40k–$60k','$60k–$75k','$75k–$100k','$100k–$150k','$150k–$200k','$200k–$300k','$300k–$500k','$500k–$1M','$1M+'];
+function updateIncome(val) {
+  document.getElementById('income-val').textContent = INCOME_LABELS[val];
+}
+
+function selectOpt(el, group) {
+  document.querySelectorAll('[onclick*="' + group + '"]').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectChip(el, group) {
+  el.closest('.severity-chips').querySelectorAll('.chip').forEach(c => {
+    c.classList.remove('sel');
+  });
+  el.classList.add('sel');
+}
+</script>
+</body>
+</html>

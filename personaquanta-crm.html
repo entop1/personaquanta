@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PersonaQuanta — Outreach CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06090F;
+  --surf: rgba(255,255,255,.045);
+  --surf2: rgba(255,255,255,.025);
+  --bdr: rgba(255,255,255,.09);
+  --bdr2: rgba(255,255,255,.05);
+  --text: #E8EEFF;
+  --muted: rgba(232,238,255,.6);
+  --muted2: rgba(232,238,255,.35);
+  --acc: #2AA7FF;
+  --acc2: #00D9AE;
+  --acc3: #FFB547;
+  --red: #FF6060;
+  --sans: 'Instrument Sans', system-ui, sans-serif;
+  --mono: 'DM Mono', monospace;
+  --serif: 'DM Serif Display', Georgia, serif;
+  --worker: 'https://pq-proxy.personaquanta.workers.dev';
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 900px 500px at 80% -5%, rgba(42,167,255,.1) 0%, transparent 60%),
+    radial-gradient(ellipse 600px 400px at 5% 40%, rgba(0,217,174,.07) 0%, transparent 55%);
+}
+
+/* NAV */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 24px;
+  background: rgba(6,9,15,.9); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--bdr);
+}
+.brand { font-family: var(--serif); font-size: 17px; margin-right: 4px; }
+.nav-tabs { display: flex; gap: 4px; flex: 1; }
+.nav-tab {
+  padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;
+  cursor: pointer; border: 1px solid transparent;
+  background: transparent; color: var(--muted);
+  font-family: var(--sans); transition: all .15s;
+}
+.nav-tab.active { background: var(--surf); border-color: var(--bdr); color: var(--text); }
+.nav-tab:hover:not(.active) { color: var(--text); }
+.nav-right { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+.nav-btn {
+  font-family: var(--mono); font-size: 10px; color: var(--muted2);
+  background: var(--surf); border: 1px solid var(--bdr);
+  border-radius: 6px; padding: 6px 12px; cursor: pointer; transition: all .15s;
+}
+.nav-btn:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
+.nav-btn.primary { color: var(--acc); border-color: rgba(42,167,255,.3); background: rgba(42,167,255,.08); }
+
+/* GATE */
+#gate {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  min-height: calc(100vh - 53px); padding: 40px 24px;
+}
+.gate-card {
+  width: 100%; max-width: 420px;
+  background: var(--surf); border: 1px solid var(--bdr);
+  border-radius: 18px; padding: 40px 36px;
+}
+.gate-label { font-family: var(--mono); font-size: 10px; color: var(--acc); letter-spacing: .12em; margin-bottom: 14px; }
+.gate-title { font-family: var(--serif); font-size: 26px; margin-bottom: 10px; }
+.gate-sub { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 28px; }
+
+/* PAGES */
+#app { display: none; position: relative; z-index: 1; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* GENERATE PAGE */
+.gen-layout {
+  max-width: 1140px; margin: 0 auto;
+  display: grid; grid-template-columns: 370px 1fr;
+  gap: 22px; padding: 28px 24px 60px;
+}
+@media (max-width: 820px) { .gen-layout { grid-template-columns: 1fr; } }
+
+/* CRM PAGE */
+.crm-layout { max-width: 1140px; margin: 0 auto; padding: 28px 24px 60px; }
+.crm-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; }
+.crm-title { font-family: var(--serif); font-size: 24px; }
+.crm-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+.stat-chip {
+  padding: 6px 14px; border-radius: 99px; font-family: var(--mono); font-size: 11px;
+  border: 1px solid var(--bdr); background: var(--surf2); color: var(--muted);
+}
+.stat-chip span { color: var(--text); font-weight: 600; }
+
+/* FILTERS */
+.filters { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+.filter-btn {
+  padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 500;
+  cursor: pointer; border: 1px solid var(--bdr);
+  background: var(--surf2); color: var(--muted); font-family: var(--sans); transition: all .15s;
+}
+.filter-btn.active { background: var(--surf); border-color: rgba(255,255,255,.2); color: var(--text); }
+
+/* CONTACT CARDS */
+.contacts-grid { display: grid; gap: 10px; }
+.contact-card {
+  background: var(--surf); border: 1px solid var(--bdr);
+  border-radius: 14px; padding: 18px 20px;
+  cursor: pointer; transition: border-color .15s, transform .1s;
+  display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start;
+}
+.contact-card:hover { border-color: rgba(255,255,255,.18); transform: translateY(-1px); }
+.contact-card.selected { border-color: var(--acc); background: rgba(42,167,255,.05); }
+.cc-name { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+.cc-role { font-size: 12px; color: var(--muted2); margin-bottom: 8px; }
+.cc-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.cc-followup { font-family: var(--mono); font-size: 10px; color: var(--acc3); }
+.cc-followup.overdue { color: var(--red); }
+.cc-actions { display: flex; gap: 6px; align-items: flex-start; }
+
+/* STATUS BADGE */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 600;
+  font-family: var(--mono); white-space: nowrap;
+}
+.s-new      { background: rgba(42,167,255,.12);  border: 1px solid rgba(42,167,255,.3);  color: var(--acc); }
+.s-sent     { background: rgba(0,217,174,.1);     border: 1px solid rgba(0,217,174,.3);   color: var(--acc2); }
+.s-seen     { background: rgba(255,181,71,.1);    border: 1px solid rgba(255,181,71,.3);  color: var(--acc3); }
+.s-followup { background: rgba(42,167,255,.08);   border: 1px solid rgba(42,167,255,.2);  color: #7CC8FF; }
+.s-replied  { background: rgba(0,217,174,.15);    border: 1px solid rgba(0,217,174,.4);   color: var(--acc2); }
+.s-declined { background: rgba(255,96,96,.08);    border: 1px solid rgba(255,96,96,.2);   color: var(--red); }
+.s-bounce   { background: rgba(255,181,71,.08);   border: 1px solid rgba(255,181,71,.2);  color: var(--acc3); }
+.s-silent   { background: rgba(255,255,255,.04);  border: 1px solid rgba(255,255,255,.1); color: var(--muted2); }
+
+/* CONTACT DETAIL PANEL */
+.detail-panel {
+  position: fixed; right: 0; top: 53px; bottom: 0; width: 480px;
+  background: #0a0f1a; border-left: 1px solid var(--bdr);
+  overflow-y: auto; z-index: 50; transform: translateX(100%);
+  transition: transform .25s ease;
+}
+.detail-panel.open { transform: translateX(0); }
+@media (max-width: 900px) { .detail-panel { width: 100%; top: 0; } }
+.dp-header {
+  padding: 20px 24px; border-bottom: 1px solid var(--bdr);
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+  position: sticky; top: 0; background: #0a0f1a; z-index: 1;
+}
+.dp-name { font-family: var(--serif); font-size: 22px; margin-bottom: 4px; }
+.dp-role { font-size: 13px; color: var(--muted2); }
+.dp-close { 
+  background: var(--surf); border: 1px solid var(--bdr); 
+  color: var(--text); font-size: 16px; cursor: pointer; 
+  padding: 6px 10px; border-radius: 8px; transition: all .15s;
+  flex-shrink: 0;
+}
+.dp-close:hover { background: rgba(255,96,96,.1); border-color: rgba(255,96,96,.3); color: var(--red); }
+.dp-body { padding: 20px 24px; display: grid; gap: 16px; }
+.dp-section-label { font-family: var(--mono); font-size: 9px; color: var(--muted2); letter-spacing: .1em; margin-bottom: 10px; }
+
+/* STATUS SELECT */
+.status-select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.status-option {
+  padding: 10px 12px; border-radius: 10px; cursor: pointer;
+  border: 1px solid var(--bdr); background: var(--surf2);
+  font-size: 12px; font-weight: 600; font-family: var(--mono);
+  transition: all .15s; text-align: center;
+}
+.status-option:hover { border-color: rgba(255,255,255,.2); }
+.status-option.selected { border-width: 2px; }
+
+/* MESSAGES TABS */
+.msg-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.msg-tab {
+  padding: 6px 12px; border-radius: 7px; font-size: 11px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--bdr);
+  background: var(--surf2); color: var(--muted); font-family: var(--sans); transition: all .15s;
+}
+.msg-tab.active { background: var(--acc); border-color: var(--acc); color: #06090F; }
+.msg-content {
+  background: var(--surf2); border: 1px solid var(--bdr); border-radius: 10px;
+  padding: 14px 16px; font-size: 13px; line-height: 1.7; color: var(--muted);
+  white-space: pre-wrap; max-height: 220px; overflow-y: auto;
+  font-family: var(--sans);
+}
+
+/* FORM ELEMENTS */
+.field { margin-bottom: 14px; }
+.field label { display: block; font-family: var(--mono); font-size: 9px; color: var(--muted2); letter-spacing: .09em; margin-bottom: 6px; }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 10px 13px; border-radius: 9px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+  color: var(--text); font-family: var(--sans); font-size: 13px;
+  outline: none; transition: border-color .15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: rgba(42,167,255,.45); }
+.field select { background: #0c1220; }
+.field textarea { resize: vertical; line-height: 1.55; }
+
+/* BUTTONS */
+.btn-primary {
+  width: 100%; padding: 13px; border-radius: 10px;
+  background: var(--acc); border: none;
+  color: #06090F; font-weight: 700; font-size: 14px;
+  font-family: var(--sans); cursor: pointer; transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .88; }
+.btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+.btn-secondary {
+  padding: 9px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--bdr);
+  background: var(--surf2); color: var(--muted); font-family: var(--sans); transition: all .15s;
+}
+.btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
+.btn-danger { border-color: rgba(255,96,96,.3); color: var(--red); }
+.btn-danger:hover { background: rgba(255,96,96,.08); }
+.btn-copy {
+  font-family: var(--mono); font-size: 10px; color: var(--muted2);
+  background: var(--surf2); border: 1px solid var(--bdr);
+  border-radius: 6px; padding: 5px 10px; cursor: pointer; transition: all .15s;
+}
+.btn-copy:hover { color: var(--acc2); border-color: rgba(0,217,174,.3); }
+.btn-copy.copied { color: var(--acc2); border-color: rgba(0,217,174,.4); background: rgba(0,217,174,.08); }
+
+/* PANEL */
+.panel { background: var(--surf); border: 1px solid var(--bdr); border-radius: 14px; padding: 24px 22px; }
+.panel-title { font-family: var(--mono); font-size: 9.5px; color: var(--muted2); letter-spacing: .1em; margin-bottom: 20px; }
+
+/* HOOK BADGE */
+.hook-badge {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: rgba(0,217,174,.07); border: 1px solid rgba(0,217,174,.2);
+  border-radius: 10px; padding: 13px 16px; margin-bottom: 16px;
+}
+.hook-label { font-family: var(--mono); font-size: 9px; color: var(--acc2); letter-spacing: .09em; margin-bottom: 5px; }
+.hook-text { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+/* EMPTY / SPINNER */
+.empty {
+  min-height: 380px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+  border: 1px dashed rgba(255,255,255,.08); border-radius: 14px;
+  color: var(--muted2); text-align: center; padding: 40px;
+}
+.empty-icon { font-size: 36px; opacity: .4; }
+.empty-title { font-size: 14px; font-weight: 600; color: var(--muted); }
+.empty-sub { font-size: 12px; max-width: 260px; line-height: 1.65; }
+.spinner-wrap { min-height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+.spinner { width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(42,167,255,.15); border-top-color: var(--acc); animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner-label { font-size: 12px; color: var(--muted2); font-family: var(--mono); }
+
+/* ERROR */
+.error-box {
+  background: rgba(255,80,80,.08); border: 1px solid rgba(255,80,80,.22);
+  border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--red); margin-bottom: 14px;
+}
+
+/* NOTE */
+.note-area {
+  width: 100%; padding: 10px 13px; border-radius: 9px;
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
+  color: var(--muted); font-family: var(--sans); font-size: 13px;
+  outline: none; resize: vertical; line-height: 1.55; min-height: 80px;
+  transition: border-color .15s;
+}
+.note-area:focus { border-color: rgba(42,167,255,.35); }
+
+.divider { border: none; border-top: 1px solid var(--bdr); margin: 16px 0; }
+.word-count { font-family: var(--mono); font-size: 10px; color: var(--muted2); text-align: right; margin-top: 6px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.tab { padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--bdr); background: var(--surf2); color: var(--muted); font-family: var(--sans); transition: all .15s; }
+.tab.active { background: var(--acc); border-color: var(--acc); color: #06090F; }
+.tab-actions { margin-left: auto; display: flex; gap: 6px; }
+.msg-box { background: var(--surf); border: 1px solid var(--bdr); border-radius: 12px; padding: 22px 20px; position: relative; min-height: 200px; }
+.msg-text { font-size: 13.5px; line-height: 1.78; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+.copy-float { position: absolute; top: 14px; right: 14px; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: #1a2235; border: 1px solid var(--bdr); border-radius: 10px;
+  padding: 12px 20px; font-size: 13px; color: var(--text);
+  transition: transform .3s ease; z-index: 999; white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="brand">PersonaQuanta</div>
+  <div class="nav-tabs" id="nav-tabs" style="display:none">
+    <button class="nav-tab active" onclick="switchPage('generate')">◈ Генератор</button>
+    <button class="nav-tab" onclick="switchPage('crm')">⬡ CRM</button>
+  </div>
+  <div class="nav-right">
+    <div id="sync-status" style="font-family:var(--mono);font-size:10px;color:var(--muted2);display:none"></div>
+    <button class="nav-btn" onclick="resetKey()">⚙ API KEY</button>
+  </div>
+</nav>
+
+<!-- GATE -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-label">PERSONAQUANTA</div>
+    <div class="gate-title">Outreach CRM</div>
+    <div class="gate-sub">Генератор повідомлень + трекер контактів. Дані зберігаються в хмарі — доступні з будь-якого пристрою.</div>
+    <div class="field">
+      <label>ANTHROPIC API KEY</label>
+      <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off"
+        onkeydown="if(event.key==='Enter') activateKey()" />
+    </div>
+    <div id="gate-error" class="error-box" style="display:none"></div>
+    <button class="btn-primary" onclick="activateKey()">Продовжити →</button>
+    <div style="margin-top:16px;font-family:var(--mono);font-size:10px;color:var(--muted2);line-height:1.7;">
+      Key використовується тільки для запитів до Claude API.<br>
+      Не зберігається на сервері. Знайти: console.anthropic.com
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- GENERATE PAGE -->
+  <div class="page active" id="page-generate">
+    <div class="gen-layout">
+      <div>
+        <div class="panel">
+          <div class="panel-title">CONTACT DETAILS</div>
+          <div class="field"><label>ІМ'Я *</label><input type="text" id="f-name" placeholder="Sarah" /></div>
+          <div class="field"><label>КОМПАНІЯ *</label><input type="text" id="f-company" placeholder="Monzo, Lemonade..." /></div>
+          <div class="field"><label>LINKEDIN URL</label><input type="url" id="f-linkedin" placeholder="https://linkedin.com/in/..." /></div>
+          <div class="field">
+            <label>ПОСАДА</label>
+            <select id="f-title">
+              <option>Head of Product</option><option>VP Product</option><option>CPO / Chief Product Officer</option>
+              <option>VP Growth</option><option>Head of Growth</option><option>CDO / Chief Digital Officer</option>
+              <option>Head of CX</option><option>VP Customer Experience</option>
+              <option>Head of Partnerships</option><option>Founder / CEO</option><option>Co-founder</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>ТИП КОМПАНІЇ</label>
+            <select id="f-type">
+              <option>Neobank</option><option>Insurtech</option><option>Embedded Finance</option>
+              <option>Wealth Management</option><option>Financial Wellness App</option>
+              <option>Lending Platform</option><option>Traditional Insurance Carrier</option>
+              <option>Bank Innovation Lab</option><option>Fintech Startup</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>КАНАЛ</label>
+            <select id="f-channel">
+              <option>Обидва (LinkedIn + Email)</option>
+              <option>Тільки LinkedIn DM</option>
+              <option>Тільки Email</option>
+            </select>
+          </div>
+          <hr class="divider">
+          <div class="field"><label>КОНТЕКСТ (необов'язково)</label><textarea id="f-context" rows="3" placeholder="Нещодавно запустили продукт, підняли раунд..."></textarea></div>
+          <div class="field"><label>НОВИНИ / ТРИГЕР (необов'язково)</label><textarea id="f-news" rows="3" placeholder="Пост в LinkedIn, job posting..."></textarea></div>
+          <div id="form-error" class="error-box" style="display:none"></div>
+          <button class="btn-primary" id="gen-btn" onclick="generate()">Генерувати повідомлення →</button>
+        </div>
+      </div>
+      <div id="right-panel">
+        <div class="empty">
+          <div class="empty-icon">◈</div>
+          <div class="empty-title">Заповни форму зліва</div>
+          <div class="empty-sub">Введи ім'я і компанію, натисни «Генерувати» — отримаєш 5 персоналізованих повідомлень</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRM PAGE -->
+  <div class="page" id="page-crm">
+    <div class="crm-layout">
+      <div class="crm-header">
+        <div>
+          <div class="crm-title">Pipeline</div>
+        </div>
+        <div class="crm-stats" id="crm-stats"></div>
+      </div>
+      <div class="filters" id="filters">
+        <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">Всі</button>
+        <button class="filter-btn" data-filter="new" onclick="setFilter('new',this)">🔵 Новий</button>
+        <button class="filter-btn" data-filter="sent" onclick="setFilter('sent',this)">✅ Відправлено</button>
+        <button class="filter-btn" data-filter="seen" onclick="setFilter('seen',this)">👀 Переглянуто</button>
+        <button class="filter-btn" data-filter="followup" onclick="setFilter('followup',this)">🔄 Follow-up</button>
+        <button class="filter-btn" data-filter="replied" onclick="setFilter('replied',this)">💬 Відповів</button>
+        <button class="filter-btn" data-filter="declined" onclick="setFilter('declined',this)">❌ Відмова</button>
+        <button class="filter-btn" data-filter="bounce" onclick="setFilter('bounce',this)">⚠️ Bounce</button>
+        <button class="filter-btn" data-filter="silent" onclick="setFilter('silent',this)">🚫 Мовчить</button>
+      </div>
+      <div class="contacts-grid" id="contacts-grid">
+        <div class="empty"><div class="empty-icon">⬡</div><div class="empty-title">Завантаження...</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- OVERLAY -->
+<div id="panel-overlay" onclick="closeDetail()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:49;backdrop-filter:blur(2px);"></div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-panel" id="detail-panel">
+  <div class="dp-header">
+    <div>
+      <div class="dp-name" id="dp-name">—</div>
+      <div class="dp-role" id="dp-role">—</div>
+    </div>
+    <button class="dp-close" onclick="closeDetail()">✕</button>
+  </div>
+  <div class="dp-body" id="dp-body"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div style="text-align:center;font-size:11px;color:#3A4560;padding:16px;border-top:1px solid rgba(255,255,255,0.04);">
+  © 2026 PersonaQuanta · All rights reserved · <a href="https://www.linkedin.com/in/pozhydaiev/" style="color:#2AA7FF;text-decoration:none;" target="_blank">linkedin.com/in/pozhydaiev</a>
+</div>
+
+<script>
+const WORKER = 'https://pq-proxy.personaquanta.workers.dev';
+let apiKey = '';
+let contacts = [];
+let activeFilter = 'all';
+let selectedContactId = null;
+let activeGenTab = 'linkedin_dm';
+let currentResult = null;
+let activeMsgTab = 'linkedin_dm';
+
+const STATUSES = {
+  new:      { label: '🔵 Новий',        cls: 's-new' },
+  sent:     { label: '✅ Відправлено',   cls: 's-sent' },
+  seen:     { label: '👀 Переглянуто',   cls: 's-seen' },
+  followup: { label: '🔄 Follow-up',     cls: 's-followup' },
+  replied:  { label: '💬 Відповів',      cls: 's-replied' },
+  declined: { label: '❌ Відмова',       cls: 's-declined' },
+  bounce:   { label: '⚠️ Bounce',        cls: 's-bounce' },
+  silent:   { label: '🚫 Мовчить',       cls: 's-silent' },
+};
+
+const SYSTEM_PROMPT = `You are a B2B outreach specialist writing cold messages for PersonaQuanta — an engagement & education layer for fintech and life insurance product teams.
+
+PersonaQuanta sells a Pilot Blueprint Pack (not production software) that helps product teams build an interactive "economic persona" experience: users answer a short questionnaire and receive explainable indices (NW/LEP/SEV/CS) with uncertainty ranges, confidence scores (CONF), top drivers, and what-if exploration.
+
+Core positioning:
+- "Engagement & education layer" — not a decisioning engine
+- Pseudonym-first (no real name required, no bank logins)
+- Explainable Top Drivers (plain language)
+- CONF + uncertainty ranges (no false precision)
+- What-if exploration (3 presets: income, debt, coverage)
+- Blueprint your team implements — not production software
+- Founding Cohort: 10 companies, 3 spots filled
+- Pilot Blueprint Pack: Option A $4,900 / B $9,900 / C $14,900 (one-time)
+
+NEVER say: entertainment-first, magic score, AI model, underwriting tool, credit scoring
+ALWAYS say: engagement & education layer, explainable economic profile, uncertainty-aware ranges
+
+Write messages that:
+1. Open with a specific hook tied to their role or company — not generic openers
+2. Connect that hook to PersonaQuanta value in ONE sentence
+3. Are short (LinkedIn DM <120 words, Email <200 words)
+4. End with one low-commitment CTA
+5. Sound like a founder, not a sales rep
+6. Always sign off as: Maksym Pozhydaiev / PersonaQuanta — never use [Your Name] or placeholders
+
+Sign-off for all messages: "Maksym Pozhydaiev / PersonaQuanta" — never use [Your Name], [Name], or any placeholder.
+
+Output ONLY valid JSON, no markdown, no code fences, no explanation:
+{"linkedin_dm":"...","email_subject":"...","email_body":"...","followup_d3":"...","followup_d7":"...","hook_used":"one sentence explaining the hook angle used"}`;
+
+// ── KEY ──
+function activateKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  const err = document.getElementById('gate-error');
+  if (!val.startsWith('sk-')) { err.textContent = 'Key повинен починатись з sk-'; err.style.display = 'block'; return; }
+  apiKey = val;
+  err.style.display = 'none';
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('nav-tabs').style.display = 'flex';
+  loadContacts();
+}
+function resetKey() {
+  apiKey = '';
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('gate').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('nav-tabs').style.display = 'none';
+}
+
+// ── PAGES ──
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-tab')[page === 'generate' ? 0 : 1].classList.add('active');
+  if (page === 'crm') renderContacts();
+}
+
+// ── CONTACTS API ──
+async function loadContacts() {
+  setSyncStatus('↻ синхронізація...');
+  try {
+    const res = await fetch(WORKER + '/contacts');
+    contacts = await res.json();
+    renderContacts();
+    renderStats();
+    setSyncStatus('✓ синхронізовано');
+    setTimeout(() => setSyncStatus(''), 2000);
+  } catch(e) { setSyncStatus('⚠ офлайн'); }
+}
+
+async function saveContact(contact) {
+  setSyncStatus('↻ збереження...');
+  try {
+    const method = contact.id ? 'PUT' : 'POST';
+    const res = await fetch(WORKER + '/contacts', {
+      method, headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(contact)
+    });
+    const saved = await res.json();
+    if (contact.id) {
+      const idx = contacts.findIndex(c => c.id === contact.id);
+      if (idx !== -1) contacts[idx] = saved;
+    } else {
+      contacts.unshift(saved);
+    }
+    renderContacts();
+    renderStats();
+    setSyncStatus('✓ збережено');
+    setTimeout(() => setSyncStatus(''), 2000);
+    return saved;
+  } catch(e) { setSyncStatus('⚠ помилка збереження'); return contact; }
+}
+
+async function deleteContact(id) {
+  if (!confirm('Видалити контакт?')) return;
+  await fetch(WORKER + '/contacts', {
+    method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id })
+  });
+  contacts = contacts.filter(c => c.id !== id);
+  closeDetail();
+  renderContacts();
+  renderStats();
+  showToast('Контакт видалено');
+}
+
+// ── RENDER CRM ──
+function setSyncStatus(t) {
+  const el = document.getElementById('sync-status');
+  el.style.display = t ? 'block' : 'none';
+  el.textContent = t;
+}
+
+function renderStats() {
+  const el = document.getElementById('crm-stats');
+  const total = contacts.length;
+  const replied = contacts.filter(c => c.status === 'replied').length;
+  const followup = contacts.filter(c => c.status === 'followup').length;
+  const overdue = contacts.filter(c => {
+    if (!c.followupDate) return false;
+    return new Date(c.followupDate) < new Date() && !['replied','declined'].includes(c.status);
+  }).length;
+  el.innerHTML = `
+    <div class="stat-chip">Всього <span>${total}</span></div>
+    <div class="stat-chip">Відповіли <span>${replied}</span></div>
+    <div class="stat-chip">Follow-up <span>${followup}</span></div>
+    ${overdue ? `<div class="stat-chip" style="border-color:rgba(255,96,96,.3);color:var(--red)">Прострочено <span>${overdue}</span></div>` : ''}
+  `;
+}
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderContacts();
+}
+
+function renderContacts() {
+  const grid = document.getElementById('contacts-grid');
+  let filtered = activeFilter === 'all' ? contacts : contacts.filter(c => c.status === activeFilter);
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">⬡</div><div class="empty-title">${contacts.length ? 'Немає контактів з таким статусом' : 'Ще немає контактів'}</div><div class="empty-sub">Згенеруй перше повідомлення у вкладці Генератор</div></div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(c => {
+    const st = STATUSES[c.status || 'new'];
+    const isOverdue = c.followupDate && new Date(c.followupDate) < new Date() && !['replied','declined'].includes(c.status);
+    const followupStr = c.followupDate ? `📅 ${formatDate(c.followupDate)}` : '';
+    return `
+      <div class="contact-card ${selectedContactId === c.id ? 'selected' : ''}" onclick="openDetail('${c.id}')">
+        <div>
+          <div class="cc-name">${c.name} <span style="font-size:12px;font-weight:400;color:var(--muted2)">@ ${c.company}</span></div>
+          <div class="cc-role">${c.title} · ${c.type}</div>
+          <div class="cc-meta">
+            <span class="status-badge ${st.cls}">${st.label}</span>
+            ${followupStr ? `<span class="cc-followup ${isOverdue ? 'overdue' : ''}">${isOverdue ? '⚠ ' : ''}${followupStr}</span>` : ''}
+            ${c.linkedinUrl ? `<a href="${c.linkedinUrl}" target="_blank" style="font-family:var(--mono);font-size:10px;color:var(--acc);text-decoration:none;" onclick="event.stopPropagation()">↗ LinkedIn</a>` : ''}
+          </div>
+        </div>
+        <div class="cc-actions">
+          <button class="btn-copy" onclick="event.stopPropagation();quickCopy('${c.id}')" title="Копіювати DM">⎘</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function formatDate(d) {
+  const date = new Date(d);
+  return date.toLocaleDateString('uk', { day: 'numeric', month: 'short' });
+}
+
+function quickCopy(id) {
+  const c = contacts.find(x => x.id === id);
+  if (c?.messages?.linkedin_dm) {
+    navigator.clipboard.writeText(c.messages.linkedin_dm);
+    showToast('LinkedIn DM скопійовано');
+  }
+}
+
+// ── DETAIL PANEL ──
+function openDetail(id) {
+  const c = contacts.find(x => x.id === id);
+  if (!c) return;
+  selectedContactId = id;
+  renderContacts();
+  document.getElementById('dp-name').textContent = c.name + ' @ ' + c.company;
+  document.getElementById('dp-role').textContent = c.title + ' · ' + c.type;
+  const body = document.getElementById('dp-body');
+
+  const msgs = c.messages || {};
+  const TABS_CFG = [
+    { key: 'linkedin_dm', label: '◈ LinkedIn DM' },
+    { key: 'email', label: '✉ Email' },
+    { key: 'followup_d3', label: '🔄 D+3' },
+    { key: 'followup_d7', label: '⤷ D+7' },
+  ];
+
+  body.innerHTML = `
+    <!-- STATUS -->
+    <div>
+      <div class="dp-section-label">СТАТУС</div>
+      <div class="status-select-grid">
+        ${Object.entries(STATUSES).map(([key, s]) => `
+          <div class="status-option ${s.cls} ${(c.status||'new')===key?'selected':''}"
+            onclick="updateStatus('${id}','${key}')">
+            ${s.label}
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- FOLLOW-UP DATE -->
+    <div>
+      <div class="dp-section-label">ДАТА FOLLOW-UP</div>
+      <div class="field" style="margin-bottom:0">
+        <input type="date" id="dp-followup" value="${c.followupDate||''}"
+          onchange="updateFollowup('${id}', this.value)"
+          style="background:var(--surf2);border:1px solid var(--bdr);color:var(--text);font-family:var(--mono);font-size:12px;" />
+      </div>
+    </div>
+
+    <!-- LINKEDIN -->
+    ${c.linkedinUrl ? `
+    <div>
+      <div class="dp-section-label">ПРОФІЛЬ</div>
+      <a href="${c.linkedinUrl}" target="_blank" style="font-family:var(--mono);font-size:12px;color:var(--acc);">↗ ${c.linkedinUrl}</a>
+    </div>` : ''}
+
+    <!-- MESSAGES -->
+    ${Object.keys(msgs).length ? `
+    <div>
+      <div class="dp-section-label">ПОВІДОМЛЕННЯ</div>
+      ${c.messages?.hook_used ? `<div class="hook-badge"><div><div class="hook-label">HOOK</div><div class="hook-text">${c.messages.hook_used}</div></div></div>` : ''}
+      <div class="msg-tabs">
+        ${TABS_CFG.map(t => `<button class="msg-tab ${t.key==='linkedin_dm'?'active':''}" onclick="switchDpTab('${id}','${t.key}',this)">${t.label}</button>`).join('')}
+        <button class="btn-copy" id="dp-copy-btn" onclick="copyDpMsg('${id}','linkedin_dm')" style="margin-left:auto">Копіювати</button>
+      </div>
+      <div class="msg-content" id="dp-msg-content">${msgs.linkedin_dm||''}</div>
+    </div>` : '<div style="font-size:13px;color:var(--muted2)">Повідомлення ще не згенеровані</div>'}
+
+    <!-- NOTES -->
+    <div>
+      <div class="dp-section-label">НОТАТКИ</div>
+      <textarea class="note-area" placeholder="Додай нотатку..." onblur="updateNote('${id}',this.value)">${c.notes||''}</textarea>
+    </div>
+
+    <!-- CONTEXT -->
+    <div style="padding:14px;background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;">
+      <div class="dp-section-label">КОНТЕКСТ</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;">${c.context||'—'}</div>
+      ${c.news ? `<div style="font-size:12px;color:var(--muted2);margin-top:8px;line-height:1.6;">📰 ${c.news}</div>` : ''}
+    </div>
+
+    <!-- SEND EMAIL -->
+    <div>
+      <div class="dp-section-label">ВІДПРАВИТИ ЛИСТ</div>
+      <div style="display:grid;gap:8px;">
+        <div class="field" style="margin-bottom:8px;">
+          <label>EMAIL ОТРИМУВАЧА</label>
+          <input type="email" id="dp-to-${id}" placeholder="sarah@company.com"
+            style="background:var(--surf2);border:1px solid var(--bdr);color:var(--text);font-family:var(--sans);font-size:13px;" />
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button class="btn-secondary" onclick="sendEmail('${id}','email')" style="font-size:12px;">✉ Відправити Email</button>
+          <button class="btn-secondary" onclick="sendEmail('${id}','followup_d3')" style="font-size:12px;">🔄 Follow-up D+3</button>
+          <button class="btn-secondary" onclick="sendEmail('${id}','followup_d7')" style="font-size:12px;">⤷ Follow-up D+7</button>
+        </div>
+        <div id="send-status-${id}" style="font-family:var(--mono);font-size:11px;color:var(--muted2);min-height:18px;"></div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn-secondary" onclick="prefillGenerator('${id}')">✏ Регенерувати</button>
+      <button class="btn-secondary btn-danger" onclick="deleteContact('${id}')">✕ Видалити</button>
+    </div>
+  `;
+
+  document.getElementById('detail-panel').classList.add('open');
+  document.getElementById('panel-overlay').style.display = 'block';
+}
+
+function closeDetail() {
+  selectedContactId = null;
+  document.getElementById('detail-panel').classList.remove('open');
+  document.getElementById('panel-overlay').style.display = 'none';
+  renderContacts();
+}
+
+function switchDpTab(id, key, btn) {
+  const c = contacts.find(x => x.id === id);
+  if (!c?.messages) return;
+  document.querySelectorAll('#dp-body .msg-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const content = key === 'email'
+    ? `Subject: ${c.messages.email_subject}\n\n${c.messages.email_body}`
+    : c.messages[key] || '';
+  document.getElementById('dp-msg-content').textContent = content;
+  document.getElementById('dp-copy-btn').onclick = () => copyDpMsg(id, key);
+}
+
+function copyDpMsg(id, key) {
+  const c = contacts.find(x => x.id === id);
+  if (!c?.messages) return;
+  const content = key === 'email'
+    ? `Subject: ${c.messages.email_subject}\n\n${c.messages.email_body}`
+    : c.messages[key] || '';
+  navigator.clipboard.writeText(content);
+  showToast('Скопійовано');
+}
+
+async function updateStatus(id, status) {
+  const c = contacts.find(x => x.id === id);
+  if (!c) return;
+  c.status = status;
+  await saveContact(c);
+  if (selectedContactId === id) openDetail(id);
+  else renderContacts();
+}
+
+async function updateFollowup(id, date) {
+  const c = contacts.find(x => x.id === id);
+  if (!c) return;
+  c.followupDate = date;
+  await saveContact(c);
+  renderContacts();
+  renderStats();
+}
+
+async function updateNote(id, note) {
+  const c = contacts.find(x => x.id === id);
+  if (!c || c.notes === note) return;
+  c.notes = note;
+  await saveContact(c);
+  showToast('Нотатку збережено');
+}
+
+function prefillGenerator(id) {
+  const c = contacts.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('f-name').value = c.name;
+  document.getElementById('f-company').value = c.company;
+  document.getElementById('f-title').value = c.title;
+  document.getElementById('f-type').value = c.type;
+  document.getElementById('f-context').value = c.context || '';
+  document.getElementById('f-news').value = c.news || '';
+  closeDetail();
+  switchPage('generate');
+}
+
+// ── GENERATE ──
+async function generate() {
+  const name    = document.getElementById('f-name').value.trim();
+  const company = document.getElementById('f-company').value.trim();
+  const title   = document.getElementById('f-title').value;
+  const type    = document.getElementById('f-type').value;
+  const channel = document.getElementById('f-channel').value;
+  const context = document.getElementById('f-context').value.trim();
+  const news    = document.getElementById('f-news').value.trim();
+  const linkedin= document.getElementById('f-linkedin').value.trim();
+  const errEl   = document.getElementById('form-error');
+
+  if (!name || !company) { errEl.textContent = "Введи ім'я і назву компанії."; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true; btn.textContent = 'Генерую...';
+  showSpinner();
+
+  const userPrompt = `Write outreach messages for:
+- First name: ${name}
+- Title: ${title}
+- Company: ${company}
+- Company type: ${type}
+- Channel preference: ${channel}
+- Additional context: ${context || 'none'}
+- Recent news or trigger: ${news || 'none'}
+Generate all 5 message variants tailored to their role (${title}) at a ${type}.`;
+
+  try {
+    const res = await fetch(WORKER + '/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+      body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1500, system: SYSTEM_PROMPT, messages: [{ role: 'user', content: userPrompt }] }),
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || `API ${res.status}`); }
+    const data = await res.json();
+    const raw = data.content.map(b => b.text || '').join('');
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    currentResult = parsed;
+
+    // Save to CRM
+    const contact = { name, company, title, type, channel, context, news, linkedinUrl: linkedin, status: 'new', messages: parsed };
+    const saved = await saveContact(contact);
+    showToast(`✓ ${name} @ ${company} збережено в CRM`);
+    renderResult(parsed, saved.id);
+
+  } catch(e) {
+    showError(e.message || 'Помилка. Перевір API key.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Генерувати повідомлення →';
+  }
+}
+
+// ── RENDER RESULT ──
+function showSpinner() {
+  document.getElementById('right-panel').innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><div class="spinner-label">Генерую персоналізовані повідомлення...</div></div>`;
+}
+function showError(msg) {
+  document.getElementById('right-panel').innerHTML = `<div class="empty"><div class="empty-icon" style="color:var(--red)">⚠</div><div class="empty-title" style="color:var(--red)">Помилка</div><div class="empty-sub">${msg}</div></div>`;
+}
+
+const TABS_CFG = [
+  { key: 'linkedin_dm', label: '◈ LinkedIn DM' },
+  { key: 'email', label: '✉ Email' },
+  { key: 'followup_d3', label: '🔄 Follow-up D+3' },
+  { key: 'followup_d7', label: '⤷ Follow-up D+7' },
+];
+
+function getTabContent(result, key) {
+  if (key === 'email') return `Subject: ${result.email_subject}\n\n${result.email_body}`;
+  return result[key] || '';
+}
+
+function renderResult(result, contactId) {
+  const panel = document.getElementById('right-panel');
+  panel.innerHTML = `
+    <div class="hook-badge">
+      <div class="hook-icon" style="color:var(--acc2);font-size:15px;flex-shrink:0">◎</div>
+      <div><div class="hook-label">HOOK ВИКОРИСТАНИЙ</div><div class="hook-text">${result.hook_used}</div></div>
+    </div>
+    <div class="tabs" id="tabs-row"></div>
+    <div class="msg-box">
+      <div class="msg-text" id="msg-content"></div>
+      <div class="copy-float"><button class="btn-copy" id="copy-btn" onclick="copyActive()">Копіювати</button></div>
+    </div>
+    <div class="word-count" id="word-count"></div>
+    <div style="margin-top:12px;display:flex;gap:8px;">
+      <button class="btn-secondary" onclick="switchPage('crm')" style="font-size:12px;">→ Відкрити в CRM</button>
+      ${contactId ? `<button class="btn-secondary" onclick="openDetail('${contactId}');switchPage('crm')" style="font-size:12px;">⬡ Картка контакту</button>` : ''}
+    </div>
+  `;
+  buildTabs(result);
+  switchGenTab(result, 'linkedin_dm');
+}
+
+function buildTabs(result) {
+  const row = document.getElementById('tabs-row');
+  row.innerHTML = '';
+  TABS_CFG.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (t.key === activeGenTab ? ' active' : '');
+    btn.textContent = t.label;
+    btn.onclick = () => switchGenTab(result, t.key);
+    row.appendChild(btn);
+  });
+  const all = document.createElement('div');
+  all.className = 'tab-actions';
+  all.innerHTML = `<button class="btn-copy" id="copy-all-btn" onclick="copyAll()">Копіювати все</button>`;
+  row.appendChild(all);
+}
+
+function switchGenTab(result, key) {
+  activeGenTab = key;
+  document.querySelectorAll('#tabs-row .tab').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === TABS_CFG.find(t=>t.key===key)?.label.trim());
+  });
+  const content = getTabContent(result, key);
+  document.getElementById('msg-content').textContent = content;
+  const wc = content.split(/\s+/).filter(Boolean).length;
+  document.getElementById('word-count').textContent = `${wc} слів`;
+  buildTabs(result);
+}
+
+let copyTimer = null;
+function copyActive() {
+  if (!currentResult) return;
+  navigator.clipboard.writeText(getTabContent(currentResult, activeGenTab));
+  const btn = document.getElementById('copy-btn');
+  btn.textContent = '✓ Скопійовано'; btn.classList.add('copied');
+  clearTimeout(copyTimer);
+  copyTimer = setTimeout(() => { btn.textContent = 'Копіювати'; btn.classList.remove('copied'); }, 2000);
+}
+function copyAll() {
+  if (!currentResult) return;
+  const r = currentResult;
+  const all = [`=== LINKEDIN DM ===\n${r.linkedin_dm}`,`=== EMAIL ===\nSubject: ${r.email_subject}\n\n${r.email_body}`,`=== FOLLOW-UP D+3 ===\n${r.followup_d3}`,`=== FOLLOW-UP D+7 ===\n${r.followup_d7}`].join('\n\n---\n\n');
+  navigator.clipboard.writeText(all);
+  showToast('Все скопійовано');
+}
+
+async function sendEmail(id, type) {
+  const c = contacts.find(x => x.id === id);
+  if (!c?.messages) { showToast('⚠ Спочатку згенеруй повідомлення'); return; }
+
+  const toEl = document.getElementById('dp-to-' + id);
+  const to = toEl?.value?.trim();
+  if (!to || !to.includes('@')) { showToast('⚠ Введи email отримувача'); toEl?.focus(); return; }
+
+  const statusEl = document.getElementById('send-status-' + id);
+  statusEl.textContent = '↻ Відправляю...';
+  statusEl.style.color = 'var(--muted2)';
+
+  const msgs = c.messages;
+  let subject, body;
+
+  if (type === 'email') {
+    subject = msgs.email_subject;
+    body = msgs.email_body;
+  } else if (type === 'followup_d3') {
+    subject = `Re: ${msgs.email_subject}`;
+    body = msgs.followup_d3;
+  } else if (type === 'followup_d7') {
+    subject = `Re: ${msgs.email_subject}`;
+    body = msgs.followup_d7;
+  }
+
+  try {
+    const res = await fetch(WORKER + '/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to, subject, body, fromName: 'Maksym Pozhydaiev | PersonaQuanta' }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message || data.name || 'Помилка відправки');
+
+    // Update contact
+    const sentAt = new Date().toISOString();
+    if (!c.sentEmails) c.sentEmails = [];
+    c.sentEmails.push({ type, to, sentAt, subject });
+
+    // Auto status + follow-up date
+    if (type === 'email') {
+      c.status = 'sent';
+      c.sentAt = sentAt;
+      // Auto follow-up in 3 days
+      const fu = new Date(); fu.setDate(fu.getDate() + 3);
+      c.followupDate = fu.toISOString().split('T')[0];
+      c.status = 'followup';
+    } else if (type === 'followup_d3') {
+      // Auto next follow-up in 4 days
+      const fu = new Date(); fu.setDate(fu.getDate() + 4);
+      c.followupDate = fu.toISOString().split('T')[0];
+    } else if (type === 'followup_d7') {
+      c.status = 'silent';
+      c.followupDate = '';
+    }
+
+    await saveContact(c);
+    statusEl.textContent = '✓ Відправлено на ' + to;
+    statusEl.style.color = 'var(--acc2)';
+    showToast('✓ Лист відправлено → ' + to);
+    openDetail(id);
+
+  } catch(e) {
+    statusEl.textContent = '⚠ ' + e.message;
+    statusEl.style.color = 'var(--red)';
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

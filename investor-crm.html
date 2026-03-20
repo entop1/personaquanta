@@ -461,12 +461,22 @@ function renderAttachList() {
     list.innerHTML = '';
     return;
   }
+  var attachList = document.getElementById('attach-list');
+  if (!attachList) { list.innerHTML = ''; return; }
   list.innerHTML = attachedFiles.map(function(f, i) {
     return '<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:rgba(42,167,255,.08);border-radius:6px;border:1px solid rgba(42,167,255,.2)">' +
       '<span style="font-size:11px;color:var(--accent);font-family:monospace;flex:1;text-align:left">📄 ' + f.name + ' <span style="color:var(--muted2)">(' + (f.size/1024).toFixed(0) + 'KB)</span></span>' +
-      '<button onclick="removeAttach(' + i + ')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0">×</button>' +
+      '<button data-idx="' + i + '" class="attach-remove-btn" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0 4px">×</button>' +
       '</div>';
   }).join('');
+  // Re-bind remove buttons
+  list.querySelectorAll('.attach-remove-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      attachedFiles.splice(parseInt(this.getAttribute('data-idx')), 1);
+      renderAttachList();
+    });
+  });
 }
 
 function removeAttach(i) {
@@ -632,7 +642,7 @@ function selContact(id) {
           '</div>' +
           '<div style="margin-bottom:8px"><span style="font-size:10px;color:var(--muted2);font-family:monospace">NEXT ACTION</span><br><span style="color:var(--text)">'+p.next_action+'</span></div>' +
           '<div><span style="font-size:10px;color:var(--muted2);font-family:monospace">SUGGESTED REPLY</span>' +
-          '<div style="margin-top:6px;padding:10px;background:var(--card2);border-radius:6px;border:1px solid var(--border);color:var(--text);font-size:12px;line-height:1.6;white-space:pre-wrap" id="followup-draft">'+p.followup+'\\n\\n---\\nMaksym Pozhydaiev\\nFounder\\nPersonaQuanta + HEV\\nhttps://personaquanta.github.io/personaquanta/\\nhttps://www.linkedin.com/in/pozhydaiev/\\npersonaquanta@proton.me'+'</div>' +
+          '<div style="margin-top:6px;padding:10px;background:var(--card2);border-radius:6px;border:1px solid var(--border);color:var(--text);font-size:12px;line-height:1.6;white-space:pre-wrap" id="followup-draft">'+p.followup+'\n\n---\nMaksym Pozhydaiev\nFounder\nPersonaQuanta + HEV\nhttps://personaquanta.github.io/personaquanta/\nhttps://www.linkedin.com/in/pozhydaiev/\npersonaquanta@proton.me'+'</div>' +
           '<button id="btn-copy-followup" style="margin-top:8px;padding:6px 12px;border-radius:6px;border:1px solid rgba(42,167,255,.3);background:rgba(42,167,255,.08);color:var(--accent);font-size:11px;font-family:monospace;cursor:pointer">📋 Copy Reply</button>' +
           '<div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">' +
           '<div style="font-size:10px;color:var(--muted2);font-family:monospace;letter-spacing:.05em;margin-bottom:6px">SEND THIS REPLY VIA EMAIL</div>' +
@@ -683,15 +693,33 @@ function selContact(id) {
             if (list) list.innerHTML = replyAttachFiles.map(function(f,i){
               return '<div style="display:flex;align-items:center;gap:6px;padding:4px 8px;background:rgba(42,167,255,.08);border-radius:5px;border:1px solid rgba(42,167,255,.2)">' +
                 '<span style="font-size:11px;color:var(--accent);flex:1;text-align:left;font-family:monospace">📄 '+f.name+' <span style="color:var(--muted2)">('+Math.round(f.size/1024)+'KB)</span></span>' +
-                '<button onclick="replyAttachFiles.splice('+i+',1);document.getElementById(\'reply-attach-list\').innerHTML=\'\'" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px">×</button>' +
+                '<button data-idx="'+i+'" class="reply-remove-btn" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0 4px">×</button>' +
                 '</div>';
             }).join('');
+          });
+            // Event delegation for remove buttons
+            var listEl = document.getElementById('reply-attach-list');
+            if (listEl) {
+              listEl.addEventListener('click', function(e) {
+                var btn = e.target.closest('.reply-remove-btn');
+                if (btn) {
+                  e.stopPropagation();
+                  var idx = parseInt(btn.getAttribute('data-idx'));
+                  replyAttachFiles.splice(idx, 1);
+                  listEl.innerHTML = replyAttachFiles.map(function(f,i){
+                    return '<div style="display:flex;align-items:center;gap:6px;padding:4px 8px;background:rgba(42,167,255,.08);border-radius:5px;border:1px solid rgba(42,167,255,.2)">' +
+                      '<span style="font-size:11px;color:var(--accent);flex:1;text-align:left;font-family:monospace">📄 '+f.name+' <span style="color:var(--muted2)">('+Math.round(f.size/1024)+'KB)</span></span>' +
+                      '<button data-idx="'+i+'" class="reply-remove-btn" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0 4px">×</button>' +
+                      '</div>';
+                  }).join('');
+                }
+              });
+            }
           });
         }, 50);
 
         document.getElementById('btn-send-followup').addEventListener('click', async function() {
-          var rk = localStorage.getItem('pq_resend');
-          if (!rk) { showToast('Add Resend API key in Settings', 'error'); openConfig(); return; }
+          // Resend key handled by Cloudflare Worker
           var to = document.getElementById('reply-send-to').value.trim();
           var subj = document.getElementById('reply-send-subj').value.trim();
           var draft = document.getElementById('followup-draft');
